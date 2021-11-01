@@ -47,11 +47,21 @@ ADD --chown=app:app \
      https://dlcdn.apache.org/tomcat/tomcat-10/v10.0.12/bin/apache-tomcat-10.0.12.tar.gz \
      /app/temp
 
+#the tomcat installation will live in /app/bin
+ENV CATALINA_HOME /app/bin/apache-tomcat-10.0.12
+ENV FHIR_CATALINA_BASE /app/fhir
+ENV CAMUNDA_CATALINA_BASE /app/camunda
+
+#stop running as root now
 USER app
+
+#collect our dev files
 COPY ./superset /app/superset
 COPY ./fhir-server /app/fhir-server
 COPY startup.sh /app/startup.sh
 
 WORKDIR /app/bin
 RUN tar -zxvf ../temp/apache-tomcat-10.0.12.tar.gz .
+
+#make it go
 CMD ["/usr/bin/bash", "startup.sh"]

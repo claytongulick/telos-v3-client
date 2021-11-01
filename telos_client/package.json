@@ -21,6 +21,7 @@
   "homepage": "https://github.com/claytongulick/telos#readme",
   "dependencies": {
     "commander": "^8.2.0",
-    "sequelize": "^6.7.0"
+    "sequelize": "^6.7.0",
+    "sqlite3": "^5.0.2"
   }
 }
