@@ -1,3 +1,5 @@
+server:
+  port: 4000
 spring:
   datasource:
     url: 'jdbc:h2:file:./target/database/h2'
@@ -116,7 +118,7 @@ hapi:
     tester:
         home:
           name: Local Tester
-          server_address: 'http://localhost:8080/fhir'
+          server_address: 'http://localhost:4000/fhir'
           refuse_to_fetch_third_party_urls: false
           fhir_version: R4
         global:

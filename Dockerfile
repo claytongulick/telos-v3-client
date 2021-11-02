@@ -1,3 +1,10 @@
+FROM maven:3.8.2-jdk-11-slim as build-hapi
+WORKDIR /tmp/fhir-server-build
+
+COPY fhir-sever/ ./
+RUN mvn -ntp dependency:go-offline
+RUN mvn clean package spring-boot:repackage -Pboot -DskipTests
+
 FROM ubuntu:20.04
 
 #this is the port NodeJS will run on
@@ -28,7 +35,6 @@ RUN mkdir /app/superset
 RUN mkdir /app/fhir-server
 RUN mkdir /app/temp
 
-
 # Creates a non-root user with an explicit UID and adds permission to access the /app folder
 # For more info, please refer to https://aka.ms/vscode-docker-python-configure-containers
 RUN adduser --disabled-password --gecos "" app && chown -R app /app
@@ -40,28 +46,20 @@ RUN apt-get update && \
     python3 -m pip install gunicorn[gevent] && \
     python3 -m pip install apache-superset
 
-#JDK and Tomcat
+#JDK 
 RUN apt-get install default-jdk 
 
-ADD --chown=app:app \
-     https://dlcdn.apache.org/tomcat/tomcat-10/v10.0.12/bin/apache-tomcat-10.0.12.tar.gz \
-     /app/temp
-
 #the tomcat installation will live in /app/bin
-ENV CATALINA_HOME /app/bin/apache-tomcat-10.0.12
-ENV FHIR_CATALINA_BASE /app/fhir
-ENV CAMUNDA_CATALINA_BASE /app/camunda
+ENV FHIR_BASE /app/fhir
+ENV CAMUNDA_BASE /app/camunda
 
 #stop running as root now
 USER app
 
 #collect our dev files
 COPY ./superset /app/superset
-COPY ./fhir-server /app/fhir-server
+COPY --from=build-hapi /tmp/fhir-server-build/target/ROOT.war /app/fhir-server/fhir.war
 COPY startup.sh /app/startup.sh
-
-WORKDIR /app/bin
-RUN tar -zxvf ../temp/apache-tomcat-10.0.12.tar.gz .
 
 #make it go
 CMD ["/usr/bin/bash", "startup.sh"]
