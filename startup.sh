@@ -29,7 +29,7 @@ then
       #start FHIR server
       cd $FHIR_BASE
       echo Starting FHIR server from: $FHIR_BASE
-      java -jar fhir.war &
+      java -jar fhir-server.war &
 fi
 
 if [ "$TELOS_START_CAMUNDA" == "1" ]
@@ -38,4 +38,4 @@ then
       CATALINA_BASE=$CAMUNDA_CATALINA_BASE $CATALINA_HOME/bin/startup.sh &
 fi
 
-#wait
+wait

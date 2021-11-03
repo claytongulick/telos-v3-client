@@ -1,7 +1,7 @@
 FROM maven:3.8.2-jdk-11-slim as build-hapi
 WORKDIR /tmp/fhir-server-build
 
-COPY fhir-sever/ ./
+COPY fhir-server/ ./
 RUN mvn -ntp dependency:go-offline
 RUN mvn clean package spring-boot:repackage -Pboot -DskipTests
 
@@ -39,18 +39,20 @@ RUN mkdir /app/temp
 # For more info, please refer to https://aka.ms/vscode-docker-python-configure-containers
 RUN adduser --disabled-password --gecos "" app && chown -R app /app
 
+#disable interactive prompts for things like tzdata
+ENV DEBIAN_FRONTEND=noninteractive
+
 #superset and dependencies
 RUN apt-get update && \
     apt-get install -y build-essential libssl-dev libffi-dev python3-dev python3-pip libsasl2-dev libldap2-dev && \
-    python3 -m pip install gunicorn && \
-    python3 -m pip install gunicorn[gevent] && \
-    python3 -m pip install apache-superset
+    python3 -m pip install --no-cache-dir gunicorn && \
+    python3 -m pip install --no-cache-dir gevent && \
+    python3 -m pip install --no-cache-dir apache-superset
 
 #JDK 
-RUN apt-get install default-jdk 
+RUN apt-get install -y openjdk-11-jre-headless
 
-#the tomcat installation will live in /app/bin
-ENV FHIR_BASE /app/fhir
+ENV FHIR_BASE /app/fhir-server
 ENV CAMUNDA_BASE /app/camunda
 
 #stop running as root now
@@ -60,6 +62,13 @@ USER app
 COPY ./superset /app/superset
 COPY --from=build-hapi /tmp/fhir-server-build/target/ROOT.war /app/fhir-server/fhir.war
 COPY startup.sh /app/startup.sh
+
+WORKDIR /app
+
+#which services do we want to run?
+ENV TELOS_START_SUPERSET 1
+ENV TELOS_START_FHIR 1
+ENV TELOS_START_CAMUNDA 0
 
 #make it go
 CMD ["/usr/bin/bash", "startup.sh"]
