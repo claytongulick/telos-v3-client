@@ -2,8 +2,7 @@ FROM maven:3.8.2-jdk-11-slim as build-hapi
 WORKDIR /tmp/fhir-server-build
 
 COPY fhir-server/ ./
-RUN mvn -ntp dependency:go-offline
-RUN mvn clean package spring-boot:repackage -Pboot -DskipTests
+RUN build.sh
 
 FROM ubuntu:20.04
 
@@ -60,7 +59,7 @@ USER app
 
 #collect our dev files
 COPY ./superset /app/superset
-COPY --from=build-hapi /tmp/fhir-server-build/target/ROOT.war /app/fhir-server/fhir.war
+COPY --from=build-hapi /tmp/fhir-server-build/target/fhir-server.war /app/fhir-server/fhir-server.war
 COPY startup.sh /app/startup.sh
 
 WORKDIR /app
