@@ -2,7 +2,7 @@ FROM maven:3.8.2-jdk-11-slim as build-hapi
 WORKDIR /tmp/fhir-server-build
 
 COPY fhir-server/ ./
-RUN build.sh
+RUN ./build.sh
 
 FROM ubuntu:20.04
 
