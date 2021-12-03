@@ -29,11 +29,11 @@ var express = require('express'),
     path = require('path'),
     rfs = require('rotating-file-stream'),
     compression = require('compression'),
-    passport_helper = require('./helper-passport');
+    config = require('../../env/config'),
+    passport_helper = require('./passport-utility');
 
-module.exports = function (webapp_config) {
-    let config = webapp_config;
-    let logger = webapp_config.logger;
+module.exports = function (cluster_server) {
+    let logger = cluster_server.logger;
 
     // Initialize express app
     let app = express();

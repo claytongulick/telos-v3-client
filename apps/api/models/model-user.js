@@ -9,8 +9,8 @@ let mongoose = require('mongoose'),
 
 // Helpers
 const config = require('../../env/config');
-const Paginate = require('../helpers/helper-model-paginate');
-const Encryption = require('../helpers/helper-encryption');
+const Paginate = require('../classes/helper-model-paginate');
+const Encryption = require('../classes/encryption');
 
 const jsonPatchPlugin = require('mongoose-patcher');
 

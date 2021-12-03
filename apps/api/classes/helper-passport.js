@@ -16,13 +16,9 @@
 
 const User = require('../models/model-user'),
     config = require('../../env/config'),
-    Authentication = require('./helper-authentication'),
     Nonce = require('../models/model-nonce'),
     passport = require('passport'),
     passport_jwt = require('passport-jwt'),
-    passport_local = require('passport-local'),
-    passport_custom = require('passport-custom'),
-    crypto = require('crypto'),
     util = require('util');
 
 /**
@@ -30,13 +26,13 @@ const User = require('../models/model-user'),
  * i.e. we may add OAuth, Google, FB, etc... later
  */
 function configurePassport() {
-    configureOpenID();
+    configureJWT();
 }
 
 /**
- * Set up OpenID auth
+ * Set up jwt auth
  */
-function configureOpenID() {
+function configureJWT() {
     const options = {
         jwtFromRequest: passport_jwt.ExtractJwt.fromAuthHeaderAsBearerToken(),
         secretOrKey: config.jwt_secret
