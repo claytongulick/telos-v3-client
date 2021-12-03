@@ -214,7 +214,7 @@ class Authentication {
      * @param jwt
      * @returns {Promise.<*>}
      */
-    /*static async authenticate(jwt) {
+    static async authenticate(jwt) {
         let data = await Authentication.decodeJWT(jwt);
         if(!data)
             return false;
@@ -235,7 +235,7 @@ class Authentication {
 
         return user;
 
-    }*/
+    }
 
     /**
      * Create a signed JWT with the given data

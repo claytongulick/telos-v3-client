@@ -1,0 +1,15 @@
+[Unit]
+Description=Application API Service
+After=network.target
+
+[Service]
+EnvironmentFile=/etc/environment
+
+Type=simple
+User=app
+WorkingDirectory=/home/app/deploy/apps/api
+ExecStart=/usr/local/bin/node /home/app/deploy/apps/api/server.js
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

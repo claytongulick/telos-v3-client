@@ -1,0 +1,15 @@
+[Unit]
+Description=Admin App Service
+After=network.target
+
+[Service]
+EnvironmentFile=/etc/environment
+
+Type=simple
+User=app
+WorkingDirectory=/home/app/deploy/apps/admin
+ExecStart=/usr/local/bin/node /home/app/deploy/apps/admin/server.js
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

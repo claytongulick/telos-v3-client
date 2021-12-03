@@ -1,0 +1,15 @@
+[Unit]
+Description=Application Service
+After=network.target
+
+[Service]
+Environment=NODE_ENV=development
+
+Type=simple
+User=root
+WorkingDirectory=/home/app/app
+ExecStart=/usr/local/bin/node /home/app/app/server.js
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

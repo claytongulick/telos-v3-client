@@ -1,0 +1,15 @@
+[Unit]
+Description=Application Service
+After=network.target
+
+[Service]
+EnvironmentFile=/etc/environment
+
+Type=simple
+User=app
+WorkingDirectory=/home/app/deploy/apps/proxy
+ExecStart=/usr/local/bin/node /home/app/deploy/apps/proxy/server.js
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

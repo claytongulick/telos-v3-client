@@ -30,9 +30,9 @@ let config = {
     //setting for sending emails
     email: {
         sendgrid: {
-            api_key: "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",
+            api_key: process.env.SENDGRID_API_KEY,
         },
-        from_address: 'support@teloshs.com'
+        from_address: process.env.FROM_EMAIL_ADDRESS
     },
     sms: {
         twilio: {
