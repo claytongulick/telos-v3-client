@@ -5,11 +5,12 @@
  */
 'use strict';
 const path = require('path');
+const package_json = require('../package.json');
 
 const WEBAPP_BASE = path.resolve(__dirname,'../');
 
 /**
- default.js
+ config.js
 
  Default configuration options. These can be overridden in any environment config file.
 
@@ -24,6 +25,10 @@ const WEBAPP_BASE = path.resolve(__dirname,'../');
 **/
 let config = {
     /**
+     * Include the package.json in the config to give access to version and name, etc...
+     */
+    package_json,
+    /**
      * These are default settings that will be applied to all webapps unless overridden by the config of the webapp itself
      */
     client_id: process.env.CLIENT_ID || 'local',
@@ -36,9 +41,9 @@ let config = {
     },
     sms: {
         twilio: {
-            account_sid: "AC3a10e662cd505d25503dc21cd7b8f6c2",
-            auth_token: "786d68c671491a51821211a223e2e86e",
-            from_phone: "+18175871133"
+            account_sid: process.env.TWILIO_ACCOUNT_SID,
+            auth_token: process.env.TWILIO_AUTH_TOKEN,
+            from_phone: process.env.TWILIO_PHONE_NUMBER
         }
     },
     //whether to automatically set the username to the email when the user is saved
@@ -52,13 +57,13 @@ let config = {
 
     //enables user switching after launch
     run_as: {
-        enable: false,
-        uid: 'app',
-        gid: 'app'
+        enable: process.env.ADMIN_RUNAS_ENABLE == '1',
+        uid: process.env.ADMIN_RUNAS_UID,
+        gid: process.env.ADMIN_RUNAS_GID,
     },
 
     //this is the signing secret for the JWT
-    jwt_secret: '74!5!55uP3RS3cr37.D0n773ll4ny0N3!',
+    jwt_secret: process.env.CLIENT_SECRET,
 
     //Should ratelimiting be enabled?
     disable_rate_limit: true,
@@ -71,16 +76,16 @@ let config = {
         hash_encoding: 'hex',
         salt_length: 32,
         //this is the secret used for symmetric encryption
-        encryption_secret: 'all along the watchtower, princes kept the view',
+        encryption_secret: process.env.CLIENT_SECRET,
     },
 
     //autommatically restart failed processes
     auto_restart: true,
 
     //the port to bind to for non-ssl traffic
-    port: 3000,
+    port: process.env.ADMIN_PORT,
     //the network interface to bind to. DNS entries will work for this as long as they are locally resolvable, like in the hosts file, for example
-    listen_host: '127.0.0.1',
+    listen_host: process.env.ADMIN_HOST,
     //ssl configuration
     ssl: {
         //should ssl be enabled?
@@ -97,7 +102,7 @@ let config = {
         },
     },
     //how many CPU processes to cluster across for the webapp
-    process_count: 1,
+    process_count: process.env.ADMIN_PROCESS_COUNT,
     //the logging level to use for app logging
     log_level: 'info',
     //web request logging config

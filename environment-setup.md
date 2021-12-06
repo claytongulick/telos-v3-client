@@ -1,7 +1,9 @@
+- base ubuntu 20.04 LTS
 - install java & jdk
 - install maven
 - install postgres 14
 - install nodejs
+- install certbot for lets encrypt
 - create app user and home folder
 - git clone telos-v3 repo into /home/app/deploy
 - set up ssl certificates via let's encrypt based on CLIENT_ID environment variable (use as dns)

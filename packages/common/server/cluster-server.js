@@ -11,13 +11,29 @@ let cluster = require('cluster'),
     https = require('https'),
     fs = require('fs');
 
-let config = require('../../env/config');
 let winston = require('winston');
-let package_json = require('../../package.json');
 
 class ClusterServer {
     logger;
     workers = [];
+
+    /**
+     * Instantiate a new cluster server
+     *  
+     * @typedef {Object} package_json The package.json of the client package, for use in logging
+     * @property {string} name
+     * @property {string} version
+     * 
+     * @typedef {Object} ClusterConfig
+     * @property {number} process_count The number of worker processes to spawn
+     * 
+     * @param {*} app A NodeJS style (req, res) function. Normally an express app.
+     * @param {ClusterConfig} config 
+     */
+    constructor(app, config){
+        this.app = app;
+        this.config = config;
+    }
 
     /**
      * This is the main entrypoint for the current running process
@@ -109,7 +125,10 @@ class ClusterServer {
      * Set the process to the correct user and group after starting the web server
      * @param {*} app 
      */
-    downgradePermissions(app) {
+    downgradePermissions() {
+        let app = this.app;
+        let config = this.config;
+
         if (config?.run_as?.enable && ['linux', 'darwin'].includes(process.platform)) {
             this.logger.info("Configuring posix user and group...");
             if (config.run_as.enable && app?.set)
@@ -124,7 +143,10 @@ class ClusterServer {
      * Launch https server process
      * @param {*} app 
      */
-    launchSSLServer(app) {
+    launchSSLServer() {
+        let app = this.app;
+        let config = this.config;
+
         let key_paths = config.ssl.options;
         let options = {};
         options.key = fs.readFileSync(key_paths.key);
@@ -147,12 +169,14 @@ class ClusterServer {
      * Start the webapp
      */
     async startWebapp() {
+        let app = this.app;
+        let config = this.config;
+
         this.logger.info(`Starting web server worker with process id: ${process.pid}`);
 
         //set up routes and middleware
         this.logger.info(`Configuring application...`)
         config.logger = this.logger;
-        let app = await require('./express-server')(this);
         let https_server;
 
         //start listening on the configured port
@@ -165,10 +189,10 @@ class ClusterServer {
                 this.logger.info(`HTTP server listening on ${config.listen_host}:${config.port}`);
                 //if we also want to do ssl, start a sever on the ssl port
                 if (config.ssl && config.ssl.enable) {
-                    this.https_server = this.launchSSLServer(app, config);
+                    this.https_server = this.launchSSLServer();
                     return;
                 }
-                this.downgradePermissions(app, config);
+                this.downgradePermissions();
             }
         );
 

@@ -5,7 +5,6 @@
  */
 import {html, render} from 'lit-html';
 import download from 'downloadjs';
-
 import broker from 'databroker';
 
 class SceneExport extends HTMLElement {

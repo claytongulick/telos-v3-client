@@ -11,7 +11,7 @@ let dotenv = require('dotenv');
 dotenv.config({
     path: '../../.env'
 });
-let ClusterServer = require('./server/classes/cluster-server');
+let ClusterServer = require('common/server/cluster-server');
 
 let server = new ClusterServer();
 server.start();
