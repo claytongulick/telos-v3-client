@@ -20,16 +20,14 @@ if(!NODE_ENV)
 
 let webpack_config = {
     entry: {
-        app: './app/app.js', 
-        new: './new/app.js', 
-        admin: './admin/app.js', 
+        app: './app.js', 
     },
     mode: "development",
-    context: path.resolve(__dirname,'source'),
+    context: path.resolve(__dirname,'ui'),
     output: {
         path: public_path,
-        chunkFilename: '[name]/chunks/[id].js',
-        filename: '[name]/[name].js',
+        chunkFilename: 'chunks/[id].js',
+        filename: '[name].js',
         publicPath: "/"
     },
     devtool: 'inline-source-map',
@@ -42,24 +40,10 @@ let webpack_config = {
         //new CleanWebpackPlugin(),
         new HtmlWebpackPlugin(
             {
-                title: "Kith and Kin",
+                title: "Telos Admin",
                 template: path.resolve(__dirname,'templates/app', 'index.hbs'),
-                filename: 'app/index.html',
+                filename: 'index.html',
                 chunks: ['app']
-            }),
-        new HtmlWebpackPlugin(
-            {
-                title: "Kith and Kin New User",
-                template: path.resolve(__dirname,'templates/app', 'index.hbs'),
-                filename: 'new/index.html',
-                chunks: ['new']
-            }),
-        new HtmlWebpackPlugin(
-            {
-                title: "Kith and Kin Admin",
-                template: path.resolve(__dirname,'templates/admin', 'index.hbs'),
-                filename: 'admin/index.html',
-                chunks: ['admin']
             }),
         new CopyWebpackPlugin({
             patterns: 
@@ -70,26 +54,9 @@ let webpack_config = {
                         force: true
                     },
                     {
-                        from: path.resolve(__dirname, 'shared'),
-                        to: path.resolve(__dirname, 'dist'),
-                        force: true
-                    },
-                    {
                         from: path.resolve(__dirname, 'node_modules/@ionic/core/dist/ionic/svg'),
-                        to: path.resolve(__dirname, 'dist/app/svg')
+                        to: path.resolve(__dirname, 'dist/svg')
                     },
-                    {
-                        from: path.resolve(__dirname, 'node_modules/@ionic/core/dist/ionic/svg'),
-                        to: path.resolve(__dirname, 'dist/new/svg')
-                    },
-                    {
-                        from: path.resolve(__dirname, 'node_modules/@ionic/core/dist/ionic/svg'),
-                        to: path.resolve(__dirname, 'dist/admin/svg')
-                    },
-                    {
-                        from: path.resolve(__dirname, 'node_modules/@shoelace-style/shoelace/dist/assets'),
-                        to: path.resolve(__dirname, 'dist/shoelace/assets')
-                    }
                 ],
             }
         ),

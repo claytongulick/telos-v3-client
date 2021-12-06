@@ -1,0 +1,18 @@
+- install java & jdk
+- install maven
+- install postgres 14
+- install nodejs
+- create app user and home folder
+- git clone telos-v3 repo into /home/app/deploy
+- set up ssl certificates via let's encrypt based on CLIENT_ID environment variable (use as dns)
+- build hapi fhir server
+- install superset and deps
+- npm install node deps
+- npm install lerna -g
+- lerna bootstrap to install all node deps and link repos
+- build all node apps
+- run systemd setup to enable services in ./ops/systemd
+- create databases and database users
+- run sequelize db setup and creation
+- run db seeds
+- set up cron table in ./ops/cron

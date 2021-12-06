@@ -1,0 +1,14 @@
+const path = require('path');
+const dotenv = require('dotenv');
+let env_file = path.resolve(__dirname, '..', '..', '.env');
+dotenv.config({ path: env_file });
+
+module.exports = {
+    //sequelize-cli seems to *really* want a config file.
+    //in this case, our config file just tells sequelize to use_env_variable
+    'config': path.resolve('db','config.js'),
+    'url': process.env.AUTH_DB_URI,
+    'models-path': path.resolve('db', 'models'),
+    'seeders-path': path.resolve('db', 'seeders'),
+    'migrations-path': path.resolve('db', 'migrations')
+};
