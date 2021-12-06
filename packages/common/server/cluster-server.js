@@ -23,6 +23,7 @@ class ClusterServer {
      * @typedef {Object} package_json The package.json of the client package, for use in logging
      * @property {string} name
      * @property {string} version
+     * @property {string} description
      * 
      * @typedef {Object} ClusterConfig
      * @property {number} process_count The number of worker processes to spawn
