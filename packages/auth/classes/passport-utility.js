@@ -16,7 +16,7 @@
 
 const User = require('../models/model-user'),
     config = require('../../env/config'),
-    Authentication = require('./helper-authentication'),
+    Authentication = require('./authentication'),
     Nonce = require('../models/model-nonce'),
     passport = require('passport'),
     passport_jwt = require('passport-jwt'),
