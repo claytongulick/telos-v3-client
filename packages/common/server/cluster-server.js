@@ -12,27 +12,49 @@ let cluster = require('cluster'),
     fs = require('fs');
 
 let winston = require('winston');
-
+/**
+ * 
+ * @typedef {Object} PackageJSON The package.json of the client package, for use in logging
+ * @property {string} name
+ * @property {string} version
+ * @property {string} description
+ *
+ * @typedef {Object} SSLConfig
+ * @property {boolean} enable should ssl be enabled?
+ * @property {boolean} force should we force a redirect to ssl if a request comes in on a non-ssl port?
+ * @property {numner} port the ssl port to listen on
+ * @property {Object} options the options object that will be passed directly to the network listener
+ *
+ * @typedef {Object} RunAs Process user impersonation
+ * @property {boolean} enable Whether process user impersonation should be used
+ * @property {string} gid The group id to switch to
+ * @property {string} uid The user id to switch to after launch
+ * 
+ * @typedef {Object} ClusterConfig
+ * @property {PackageJSON} package_json reference to the package.json for the application
+ * @property {number} process_count The number of worker processes to spawn
+ * @property {boolean} auto_restart Should the server auto restart the process when it fails?
+ * @property {RunAs} run_as Process impersonation / downgrading
+ * @property {number} port The port to run the server on
+ * @property {string} listen_host The host interface to listen on, 127.0.0.1 for loopback
+ * @property {SSLConfig} ssl SSL configuration
+ * 
+ * Cluster server
+ */
 class ClusterServer {
     logger;
     workers = [];
 
     /**
      * Instantiate a new cluster server
-     *  
-     * @typedef {Object} package_json The package.json of the client package, for use in logging
-     * @property {string} name
-     * @property {string} version
-     * @property {string} description
-     * 
-     * @typedef {Object} ClusterConfig
-     * @property {number} process_count The number of worker processes to spawn
      * 
      * @param {*} app A NodeJS style (req, res) function. Normally an express app.
+     * @param {*} loger The logger to use for server messages and errors
      * @param {ClusterConfig} config 
      */
-    constructor(app, config){
+    constructor(app, logger, config){
         this.app = app;
+        this.logger = logger;
         this.config = config;
     }
 
@@ -41,7 +63,6 @@ class ClusterServer {
      */
     start() {
         this.setEnvironment();
-        this.configureLogging();
 
         //if this is the master process, fork the number of desired cluster processes.
         //for simplified debugging when running locally, or optionally in any environment where process_count == 1, we skip
@@ -53,33 +74,6 @@ class ClusterServer {
 
     }
 
-    configureLogging() {
-        winston.remove('console');
-        this.logger = winston.createLogger({
-            format: winston.format.combine(
-                        winston.format.timestamp(),
-                        winston.format.printf(info => {
-                            return `${process.env.NODE_ENV} ${package_json.name} ${process.pid} @ ${info.timestamp} - ${info.level}: ${info.message}`
-                        })
-                    ),
-            transports: [
-                new winston.transports.Console({
-                    timestamp: true,
-                    level: 'verbose',
-                    colorize: true,
-                    prettyPrint: true,
-                    depth: 5,
-                    humanReadableUnhandledException: true,
-                    showLevel: true,
-                }),
-            ]
-        });
-        this.logger.on('error', 
-            e => {
-                console.error(e)
-            }
-        );
-    }
 
     setEnvironment() {
         //first, evaluate the current NODE_ENV for a valid environment
@@ -177,7 +171,6 @@ class ClusterServer {
 
         //set up routes and middleware
         this.logger.info(`Configuring application...`)
-        config.logger = this.logger;
         let https_server;
 
         //start listening on the configured port
@@ -200,7 +193,7 @@ class ClusterServer {
         //listen for a termination signal and kill the web server. This allows for graceful shutdown.
         process.on('SIGTERM',
             () => {
-                this.logger.log(`${package_json.name}: pid ${process.pid} received SIGTERM - shutting down web process...`);
+                this.logger.info(`${package_json.name}: pid ${process.pid} received SIGTERM - shutting down web process...`);
                 this.http_server.close();
                 if(this.https_server)
                     this.https_server.close();

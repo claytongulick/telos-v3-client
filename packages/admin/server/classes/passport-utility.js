@@ -35,7 +35,7 @@ function configureRemoteUser() {
         }
     );
     
-    passport.use(strategy);
+    passport.use('remote', strategy);
 }
 
 module.exports = {

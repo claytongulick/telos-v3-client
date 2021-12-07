@@ -247,7 +247,7 @@ class Authentication {
             (resolve, reject) => {
                 JWT.sign(
                     data,
-                    config.jwt_secret,
+                    config.client_secret,
                     {
                         issuer: 'app.kithandkin.app'
                     },

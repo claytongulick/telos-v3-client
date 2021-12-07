@@ -45,7 +45,7 @@ function configurePassport() {
 function configureJWTStrategy() {
     const options = {
         jwtFromRequest: passport_jwt.ExtractJwt.fromAuthHeaderAsBearerToken(),
-        secretOrKey: config.jwt_secret
+        secretOrKey: config.client_secret
     }
 
     const strategy = new passport_jwt.Strategy(options,

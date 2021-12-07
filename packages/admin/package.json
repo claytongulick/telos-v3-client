@@ -52,6 +52,7 @@
     "extract-loader": "*",
     "fast-json-patch": "^3.0.0-1",
     "file-loader": "*",
+    "glob": "^7.2.0",
     "got": "^11.8.1",
     "handlebars": "^4.7.7",
     "handlebars-helpers": "^0.10.0",

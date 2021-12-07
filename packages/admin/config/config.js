@@ -3,36 +3,103 @@
  *   All rights reserved.
  *   @author Clayton Gulick <clay@ratiosoftware.com>
  */
-'use strict';
-const path = require('path');
 const package_json = require('../package.json');
 
-const WEBAPP_BASE = path.resolve(__dirname,'../');
+/**
+ * 
+ * config.js
+ * 
+ * This provides applicaiton specific config options.
+ * 
+ * It should reflect any environment specific configuration via process.env.VARIABLE_NAME,
+ * all environment specific configuration should be handled via dotenv and /etc/environment
+ * 
+ * /etc/environment should be sourced in systemd unit files via EnvironmentFile=/etc/environment
+ * 
+ * @typedef {Object} EmailConfig
+ * @property {Object} sendgrid Sendgrid config
+ * @property {string} sendgrid.api_key The key to use for sendgrid
+ * @property {string} from_address The address to send the email from
+ * 
+ * @typedef {Object} SMSConfig
+ * @property {Object} twilio Twilio config settings
+ * @property {string} twilio.account_sid
+ * @property {string} twilio.auth_token
+ * @property {string} twilio.from_phone
+ * 
+ * @typedef {Object} CryptoConfig
+ * @property {string} digest
+ * @property {number} hash_iterations
+ * @property {number} hash_key_length
+ * @property {string} hash_encoding
+ * @property {number} salt_length
+ * @property {string} encryption_secret This should be the same as client_secret
+ * 
+ * @typedef {Object} LoggingConfig
+ * @property {string} log_level The logging level to use for logging output
+ *
+ * @typedef {Object} Config
+ * @property {string} client_id The unique id for the client
+ * @property {ClusterConfig} cluster Setting to configure the cluster server 
+ * @property {ExpressConfig} express Express server settings
+ * @property {EmailConfig} email Email configuration
+ * @property {SMSConfig} sms SMS configuration
+ * @property {string} template_path The path to the template files used by express
+ * @property {string} attachment_path When sending emails, the path where file attachments are stored
+ * @property {string} client_secret Encryption key used for signing jwts and other crypto functions. Should be unique per client
+ * @property {boolean} disable_rate_limit Used for debugging, disables all rate limits
+ * @property {CryptoConfig} crypto Symmetric cryptography options
+ * @property {LoggingConfig} logging Logging configuration
+ *
+ *
+ * @author Clay Gulick
+ * @email clay@ratiosoftware.com
+*/
 
 /**
- config.js
-
- Default configuration options. These can be overridden in any environment config file.
-
- Be aware that overriding occurs via Object.assign, so objects will be copied in total, not deep property merge
-
- Each webapp is configured separately in the webapps dictionary.
-
- When importing, Object.assign({}, webapp_default, webapp_config) occurs, so default settting can be placed in webapp_default
-
- @author Clay Gulick
- @email clay@ratiosoftware.com
-**/
+ * @type {Config}
+ */
 let config = {
-    /**
-     * Include the package.json in the config to give access to version and name, etc...
-     */
-    package_json,
-    /**
-     * These are default settings that will be applied to all webapps unless overridden by the config of the webapp itself
-     */
     client_id: process.env.CLIENT_ID || 'local',
-    //setting for sending emails
+    /** @type {import('../../common/server/cluster-server').ClusterConfig} */
+    cluster: {
+        package_json,
+        process_count: process.env.ADMIN_PROCESS_COUNT,
+        auto_restart: true,
+        run_as: {
+            enable: process.env.ADMIN_RUNAS_ENABLE == '1',
+            uid: process.env.ADMIN_RUNAS_UID,
+            gid: process.env.ADMIN_RUNAS_GID,
+        },
+        port: process.env.ADMIN_PORT,
+        listen_host: process.env.ADMIN_HOST,
+        ssl: {
+            enable: false,
+            port: 3443,
+            options: {
+                key: '',
+                cert: '',
+                ca: ''
+            },
+        },
+    },
+    /** @type {import('../../common/server/express-server').ExpressConfig} */
+    express: {
+        statics_dir: '/dist',
+        mount_path: '/admin',
+        force_ssl: false,
+        enable_compression: true,
+        compression_level: 6,
+        //web request logging config
+        web_logs: {
+            file_name: package_json.name,
+            type: 'combined', //apache 'combine' format
+            //this path must be writable by the user configured in the "run_as" setting
+            path: '/home/app/logs/admin', //if type is 'file' the folder to store log rotation
+            rotation_interval: '1d' //rotate daily
+        },
+
+    },
     email: {
         sendgrid: {
             api_key: process.env.SENDGRID_API_KEY,
@@ -46,30 +113,11 @@ let config = {
             from_phone: process.env.TWILIO_PHONE_NUMBER
         }
     },
-    //whether to automatically set the username to the email when the user is saved
-    email_is_username: false,
-
-    //the path to where templates are stored
     template_path: './templates',
-
-    //the path where email file attachments are stored
     attachment_path: './public',
-
-    //enables user switching after launch
-    run_as: {
-        enable: process.env.ADMIN_RUNAS_ENABLE == '1',
-        uid: process.env.ADMIN_RUNAS_UID,
-        gid: process.env.ADMIN_RUNAS_GID,
-    },
-
-    //this is the signing secret for the JWT
-    jwt_secret: process.env.CLIENT_SECRET,
-
-    //Should ratelimiting be enabled?
+    client_secret: process.env.CLIENT_SECRET,
     disable_rate_limit: true,
-
-    //cryptographic settings for passwords etc...
-    crypto: { 
+    crypto: {
         digest: 'sha512',
         hash_iterations: 25000,
         hash_key_length: 512,
@@ -78,42 +126,12 @@ let config = {
         //this is the secret used for symmetric encryption
         encryption_secret: process.env.CLIENT_SECRET,
     },
+    logging: {
+        //autommatically restart failed processes
+        //the logging level to use for app logging
+        log_level: 'info',
 
-    //autommatically restart failed processes
-    auto_restart: true,
-
-    //the port to bind to for non-ssl traffic
-    port: process.env.ADMIN_PORT,
-    //the network interface to bind to. DNS entries will work for this as long as they are locally resolvable, like in the hosts file, for example
-    listen_host: process.env.ADMIN_HOST,
-    //ssl configuration
-    ssl: {
-        //should ssl be enabled?
-        enable: false,
-        //should we force a redirect to ssl if a request comes in on a non-ssl port?
-        force: false,
-        //the ssl port to listen on
-        port: 3443,
-        //the options object that will be passed directly to the network listener
-        options: {
-            key: '',
-            cert: '',
-            ca: ''
-        },
-    },
-    //how many CPU processes to cluster across for the webapp
-    process_count: process.env.ADMIN_PROCESS_COUNT,
-    //the logging level to use for app logging
-    log_level: 'info',
-    //web request logging config
-    web_logs: {
-        type: 'file', //log requests to console. Valid options are 'console' or 'file'
-        type: 'combined', //apache 'combine' format
-        //this path must be writable by the user configured in the "run_as" setting
-        path: '/home/app/logs/admin', //if type is 'file' the folder to store log rotation
-        rotation_interval: '1d' //rotate daily
-    },
-
+    }
 };
 
 module.exports = config;
