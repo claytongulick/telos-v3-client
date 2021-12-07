@@ -35,9 +35,6 @@ const package_json = require('../package.json');
  * @property {number} salt_length
  * @property {string} encryption_secret This should be the same as client_secret
  * 
- * @typedef {Object} LoggingConfig
- * @property {string} log_level The logging level to use for logging output
- *
  * @typedef {Object} Config
  * @property {string} client_id The unique id for the client
  * @property {ClusterConfig} cluster Setting to configure the cluster server 
@@ -126,6 +123,7 @@ let config = {
         //this is the secret used for symmetric encryption
         encryption_secret: process.env.CLIENT_SECRET,
     },
+    /** @type {import('../../common/server/logging').LoggingConfig} */
     logging: {
         //autommatically restart failed processes
         //the logging level to use for app logging
