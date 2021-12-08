@@ -26,8 +26,7 @@ var express = require('express'),
     passport = require('passport'),
     path = require('path'),
     rfs = require('rotating-file-stream'),
-    compression = require('compression'),
-    passport_helper = require('./passport-utility');
+    compression = require('compression');
 
 /**
  * @typedef {Object} WebLogsConfig Settings for standard web access logging GET, POST, etc...
@@ -64,7 +63,7 @@ module.exports = function (logger, routes, config) {
 
     //if forcing https, force redirect on http request
     app.use(function (req, res, next) {
-        if (config.ssl.force)
+        if (config.force_ssl)
             if (!req.secure)
                 return res.redirect(['https://', req.get('Host'), req.url].join(''));
 
@@ -119,13 +118,12 @@ module.exports = function (logger, routes, config) {
     app.use(methodOverride());
 
     let router = express.Router();
+    //let each route file set up its routes the way it wants
     for(let route of routes) {
-        router.use(
-            route(router)
-        )
+        route(router)
     }
 
-    //hoist routes onto the mount path
+    //hoist the configured routes onto the mount path
     app.use(config.mount_path || '/', router);
 
     //logging error handler

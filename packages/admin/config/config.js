@@ -68,7 +68,7 @@ let config = {
             uid: process.env.ADMIN_RUNAS_UID,
             gid: process.env.ADMIN_RUNAS_GID,
         },
-        port: process.env.ADMIN_PORT,
+        port: process.env.ADMIN_HTTP_PORT,
         listen_host: process.env.ADMIN_HOST,
         ssl: {
             enable: false,
@@ -125,6 +125,8 @@ let config = {
     },
     /** @type {import('../../common/server/logging').LoggingConfig} */
     logging: {
+        //give the logger access to package.json so that it can log out messages
+        package_json,
         //autommatically restart failed processes
         //the logging level to use for app logging
         log_level: 'info',

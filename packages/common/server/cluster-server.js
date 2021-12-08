@@ -49,7 +49,7 @@ class ClusterServer {
      * Instantiate a new cluster server
      * 
      * @param {*} app A NodeJS style (req, res) function. Normally an express app.
-     * @param {*} loger The logger to use for server messages and errors
+     * @param {*} logger The logger to use for server messages and errors
      * @param {ClusterConfig} config 
      */
     constructor(app, logger, config){
@@ -67,7 +67,7 @@ class ClusterServer {
         //if this is the master process, fork the number of desired cluster processes.
         //for simplified debugging when running locally, or optionally in any environment where process_count == 1, we skip
         //the cluster creation and just run a single process
-        if (cluster.isMaster && config.process_count > 1) 
+        if (cluster.isMaster && this.config.process_count > 1) 
             this.startCluster();
         else
             this.startWebapp();
@@ -92,10 +92,10 @@ class ClusterServer {
         let worker = cluster.fork();
         worker.on('exit',
             (code, signal) => {
-                this.logger.warn(`${package_json.name}: Process ${worker.process.pid} died. Code: ${code}. Signal: ${signal}`);
+                this.logger.warn(`Process ${worker.process.pid} died. Code: ${code}. Signal: ${signal}`);
                 //should we restart the process?
-                if (config.auto_restart) {
-                    this.logger.warn(`${package_json.name}: Spawning new process.`);
+                if (this.config.auto_restart) {
+                    this.logger.warn(`Spawning new process.`);
                     this.spawn();
                 }
             });
@@ -106,12 +106,12 @@ class ClusterServer {
      * process.
      */
     startCluster() {
-        this.logger.info(`Starting ${package_json.name} v${package_json.version}`);
-        this.logger.info(package_json.description);
+        this.logger.info(`Starting ${this.config.package_json.name} v${this.config.package_json.version}`);
+        this.logger.info(this.config.package_json.description);
         this.logger.info("Configuring environment: " + process.env.NODE_ENV);
         this.logger.info("Starting cluster...");
-        this.logger.info("Spawning " + config.process_count + " web workers...");
-        for (let i = 0; i < config.process_count; i++) {
+        this.logger.info("Spawning " + this.config.process_count + " web workers...");
+        for (let i = 0; i < this.config.process_count; i++) {
             this.spawn();
         }
     }

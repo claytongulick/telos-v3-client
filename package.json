@@ -1,7 +1,13 @@
 {
   "name": "telos-v3",
   "private": true,
-  "devDependencies": {
-    "lerna": "^4.0.0"
-  }
+  "workspaces": [
+    "packages/admin",
+    "packages/api",
+    "packages/auth",
+    "packages/common",
+    "packages/patient",
+    "packages/provider",
+    "packages/proxy"
+  ]
 }

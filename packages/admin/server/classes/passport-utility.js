@@ -15,7 +15,12 @@
  */
 
 const passport = require('passport');
-const HeaderStrategy = require('passport-header');
+
+/**
+ * Basically all this does is extract headers, there's not much to it.
+ * We use the lib so that we're staying consistent with passport strategies for *all* auth
+ */
+const TrustedHeaderStrategy = require('passport-trusted-header');
 
 /**
  * Main passport config function, this will call out to all of the login strategies we want to use
@@ -27,10 +32,19 @@ function configurePassport(config) {
 
 function configureRemoteUser() {
 
-    const strategy = new HeaderStrategy.Strategy(
-        async (remote_user, next) => {
+    const strategy = new TrustedHeaderStrategy.Strategy({
+            //use REMOTE_USER standard header from proxy server
+            headers: ['REMOTE_USER']
 
-            return next(null, remote_user);
+        },
+        async (headers, next) => {
+            //REMOTE_USER will have a fqn: https://<client_id>.telhoshs.com/auth/api/user/<username>
+            //we trust the proxy server to have already verified the user, the organization affiliation
+            //and the user's role for accessing the admin app
+
+            //TODO: fetch the user info from the fqn location
+
+            return next(null, headers.REMOTE_USER);
 
         }
     );

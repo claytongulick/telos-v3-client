@@ -7,7 +7,7 @@ glob.sync(`${__dirname}/**/*.js`).forEach(
     (routePath) => {
         //don't include this file
         if(routePath.includes('index.js'))
-            continue;
+            return;
         routes.push(
             require(path.resolve(routePath))
         );
