@@ -66,8 +66,6 @@ typings/
 
 uploads
 
-/telos_client/dist
-uploads
 protected_media
 .DS_Store
 *.DS_Store

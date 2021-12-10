@@ -6,7 +6,7 @@
 - install certbot for lets encrypt
 - create app user and home folder
 - git clone telos-v3 repo into /home/app/deploy
-- set up ssl certificates via let's encrypt based on CLIENT_ID environment variable (use as dns)
+- set up ssl certificates via let's encrypt based on CLIENT_ID environment variable and whitelabel (use as dns)
 - build hapi fhir server
 - install superset and deps
 - npm install node deps

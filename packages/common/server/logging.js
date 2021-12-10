@@ -23,13 +23,13 @@ class Logging {
             format: winston.format.combine(
                         winston.format.timestamp(),
                         winston.format.printf(info => {
-                            return `${process.env.NODE_ENV} ${config.cluster.package_json.name} ${process.pid} @ ${info.timestamp} - ${info.level}: ${info.message}`
+                            return `${process.env.NODE_ENV} ${config.package_json.name} ${process.pid} @ ${info.timestamp} - ${info.level}: ${info.message}`
                         })
                     ),
             transports: [
                 new winston.transports.Console({
                     timestamp: true,
-                    level: config.logging.log_level,
+                    level: config.log_level,
                     colorize: true,
                     prettyPrint: true,
                     depth: 5,
