@@ -11,14 +11,18 @@
 /**
  * Module dependencies.
  */
-var express = require('express'),
+let express = require('express'),
     morgan = require('morgan'),
     helmet = require('helmet'),
-    passport = require('passport'),
     methodOverride = require('method-override'),
     path = require('path'),
+    redis = require('redis');
     session = require('express-session');
+    RedisStore = require('connect-redis')(session);
     rfs = require('rotating-file-stream');
+
+let http_proxy = require('http-proxy');
+let proxy = http_proxy.createProxyServer({});
 
 /**
  * @typedef {Object} WebLogsConfig Settings for standard web access logging GET, POST, etc...
@@ -39,7 +43,7 @@ var express = require('express'),
  * @param {ExpressConfig} config 
  * @returns 
  */
-module.exports = function (logger, routes, proxy, config) {
+module.exports = function (logger, routes, config) {
 
     // Initialize express app
     let app = express();
@@ -48,10 +52,18 @@ module.exports = function (logger, routes, proxy, config) {
 
     // Use helmet to secure Express headers
     app.use(helmet.frameguard('sameorigin'));
-    app.use(helmet.xssFilter());
-    app.use(helmet.noSniff());
+    app.use(helmet.contentSecurityPolicy({
+        useDefaults: true
+    }));
+    app.use(helmet.dnsPrefetchControl());
+    app.use(helmet.expectCt());
+    app.use(helmet.hidePoweredBy());
+    app.use(helmet.hsts());
     app.use(helmet.ieNoOpen());
-    app.disable('x-powered-by');
+    app.use(helmet.noSniff());
+    app.use(helmet.permittedCrossDomainPolicies());
+    app.use(helmet.referrerPolicy());
+    app.use(helmet.xssFilter());
 
     //configure statics
     if (typeof config.statics_dir == 'string')
@@ -82,36 +94,50 @@ module.exports = function (logger, routes, proxy, config) {
     //disable any sort of view caching
     app.set('view cache', false);
 
-    //determine the cookie host
-    //the cookie should be set on the root domain
-    /** @type {string} */
-    let request_host = req.headers.host;
-    let cookie_host_domain;
-    //for local development
-    if(request_host == 'localhost') {
-        cookie_host_domain = 'localhost';
-    }
-    else {
-        //for belt and suspenders, only allow domains we know about
-        let root_domain = request_host.split('.').slice(-2).join('.');
-        if(process.env.HOSTNAME == root_domain)
-            cookie_host_domain = root_domain;
-        if(process.env.WHITELABEL_HOSTNAME == root_domain)
-            cookie_host_domain = root_domain;
-    }
-
-    app.use(session({
-        secret: process.env.CLIENT_SECRET,
-        name: 'telos.sid',
-        saveUninitialized: false,
-        cookie: {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'strict',
-            domain: cookie_host_domain,
-            maxAge: process.env.SESSION_MAX_AGE || (1000 * 60 * 20) //default to 20 mins if not set
+    //set up dynamic session based on the hostname that came into this IP. 
+    //this is to support *.teloshs.com as well as whitelabeled domains
+    app.use((req, res, next) => {
+        //determine the cookie host
+        //the cookie should be set on the root domain
+        /** @type {string} */
+        let request_host = req.headers.host;
+        let cookie_host_domain;
+        //for local development
+        if(request_host == 'localhost') {
+            cookie_host_domain = 'localhost';
         }
-    }))
+        else {
+            //for belt and suspenders, only allow domains we know about
+            let root_domain = request_host.split('.').slice(-2).join('.');
+            if(process.env.HOSTNAME == root_domain)
+                cookie_host_domain = root_domain;
+            if(process.env.WHITELABEL_HOSTNAME == root_domain)
+                cookie_host_domain = root_domain;
+        }
+
+        let session_options = {
+            secret: process.env.CLIENT_SECRET,
+            name: 'telos.sid',
+            saveUninitialized: false,
+            cookie: {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'strict',
+                domain: cookie_host_domain,
+                maxAge: process.env.SESSION_MAX_AGE || (1000 * 60 * 20) //default to 20 mins if not set
+            }
+        }
+
+        if(process.env.ENABLE_REDIS_SESSION) {
+            let redis_client = redis.createClient({
+                host: process.env.REDIS_HOST
+            });
+            session_options.store = new RedisStore({client: redis_client});
+        }
+
+        let dynamic_session = session(session_options);
+        dynamic_session(req, res, next);
+    });
 
     //allow the use of modern http verbs for older clients that might not support them (PUT, etc...)
     app.use(methodOverride());

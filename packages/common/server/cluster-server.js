@@ -153,7 +153,7 @@ class ClusterServer {
                 host: config.listen_host
             },
             () => {
-                this.logger.info(`${config.name}: HTTPS server listening on ${config.listen_host}:${config.ssl.port}`);
+                this.logger.info(`HTTPS server listening on ${config.listen_host}:${config.ssl.port}`);
                 this.downgradePermissions(app);
             }
         );
