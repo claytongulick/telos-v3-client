@@ -1,12 +1,5 @@
-/*
- *   Copyright (c) 2020 Ratio Software, LLC 
- *   All rights reserved.
- *   @author Clayton Gulick <clay@ratiosoftware.com>
- */
-'use strict';
-
 /**
- * helper-express.js
+ * express-server.js
  *
  * Utility to configure and launch express server
  *
@@ -15,18 +8,21 @@
  *
  */
 
-
 /**
  * Module dependencies.
  */
-var express = require('express'),
+let express = require('express'),
     morgan = require('morgan'),
     helmet = require('helmet'),
     methodOverride = require('method-override'),
-    passport = require('passport'),
     path = require('path'),
-    rfs = require('rotating-file-stream'),
-    compression = require('compression');
+    redis = require('redis');
+    session = require('express-session');
+    RedisStore = require('connect-redis')(session);
+    rfs = require('rotating-file-stream');
+
+let http_proxy = require('http-proxy');
+let proxy = http_proxy.createProxyServer({});
 
 /**
  * @typedef {Object} WebLogsConfig Settings for standard web access logging GET, POST, etc...
@@ -47,7 +43,7 @@ var express = require('express'),
  * @param {ExpressConfig} config 
  * @returns 
  */
-module.exports = function (logger, routes, config) {
+module.exports = function (logger, routes, config, middleware) {
 
     // Initialize express app
     let app = express();
@@ -56,23 +52,18 @@ module.exports = function (logger, routes, config) {
 
     // Use helmet to secure Express headers
     app.use(helmet.frameguard('sameorigin'));
-    app.use(helmet.xssFilter());
-    app.use(helmet.noSniff());
+    app.use(helmet.contentSecurityPolicy({
+        useDefaults: true
+    }));
+    app.use(helmet.dnsPrefetchControl());
+    app.use(helmet.expectCt());
+    app.use(helmet.hidePoweredBy());
+    app.use(helmet.hsts());
     app.use(helmet.ieNoOpen());
-    app.disable('x-powered-by');
-
-    //if forcing https, force redirect on http request
-    app.use(function (req, res, next) {
-        if (config.force_ssl)
-            if (!req.secure)
-                return res.redirect(['https://', req.get('Host'), req.url].join(''));
-
-        next();
-    });
-
-    // Should be placed before express.static
-    if(config.enable_compression)
-        app.use(compression({level: config.compression_level || -1}));
+    app.use(helmet.noSniff());
+    app.use(helmet.permittedCrossDomainPolicies());
+    app.use(helmet.referrerPolicy());
+    app.use(helmet.xssFilter());
 
     //configure statics
     if (typeof config.statics_dir == 'string')
@@ -97,22 +88,56 @@ module.exports = function (logger, routes, config) {
         app.use(morgan(config.web_logs.type));
     }
 
-
     //make json output pretty
     app.set('json spaces', 2);
 
     //disable any sort of view caching
     app.set('view cache', false);
 
-    //add passport middleware
-    app.use(passport.initialize());
+    //set up dynamic session based on the hostname that came into this IP. 
+    //this is to support *.teloshs.com as well as whitelabeled domains
+    app.use((req, res, next) => {
+        //determine the cookie host
+        //the cookie should be set on the root domain
+        /** @type {string} */
+        let request_host = req.headers.host;
+        let cookie_host_domain;
+        //for local development
+        if(request_host == 'localhost') {
+            cookie_host_domain = 'localhost';
+        }
+        else {
+            //for belt and suspenders, only allow domains we know about
+            let root_domain = request_host.split('.').slice(-2).join('.');
+            if(process.env.HOSTNAME == root_domain)
+                cookie_host_domain = root_domain;
+            if(process.env.WHITELABEL_HOSTNAME == root_domain)
+                cookie_host_domain = root_domain;
+        }
 
-    // Request body parsing middleware should be above methodOverride
-    app.use(express.json({ limit: '10mb' }));
-    app.use(express.urlencoded({
-        extended: true,
-        limit: '10mb'
-    }));
+        let session_options = {
+            secret: process.env.CLIENT_SECRET,
+            name: 'telos.sid',
+            saveUninitialized: false,
+            cookie: {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'strict',
+                domain: cookie_host_domain,
+                maxAge: process.env.SESSION_MAX_AGE || (1000 * 60 * 20) //default to 20 mins if not set
+            }
+        }
+
+        if(process.env.ENABLE_REDIS_SESSION) {
+            let redis_client = redis.createClient({
+                host: process.env.REDIS_HOST
+            });
+            session_options.store = new RedisStore({client: redis_client});
+        }
+
+        let dynamic_session = session(session_options);
+        dynamic_session(req, res, next);
+    });
 
     //allow the use of modern http verbs for older clients that might not support them (PUT, etc...)
     app.use(methodOverride());
@@ -122,9 +147,14 @@ module.exports = function (logger, routes, config) {
     for(let route of routes) {
         route(router)
     }
-
     //hoist the configured routes onto the mount path
     app.use(config.mount_path || '/', router);
+
+    //register any additional middleware the server wants
+    if(middleware && Array.isArray(middleware)) {
+        for(let m of middleware)
+            app.use(m)
+    }
 
     //logging error handler
     app.use((err, req, res, next) => {

@@ -8,7 +8,10 @@
   "author": "Clayton C Gulick",
   "license": "UNLICENSED",
   "dependencies": {
+    "pg": "^8.7.1",
+    "pg-hstore": "^2.3.4",
     "prom-client": "^14.0.1",
+    "sequelize": "^6.12.0-beta.3",
     "winston": "^3.3.3"
   }
 }

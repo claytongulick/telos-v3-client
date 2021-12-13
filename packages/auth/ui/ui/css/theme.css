@@ -1,0 +1,112 @@
+
+:root {
+  --ion-color-primary: #00a79d;
+  --ion-color-primary-rgb: 0,167,157;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255,255,255;
+  --ion-color-primary-shade: #00938a;
+  --ion-color-primary-tint: #1ab0a7;
+
+
+  --ion-color-secondary: #0cd1e8;
+  --ion-color-secondary-rgb: 12,209,232;
+  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255,255,255;
+  --ion-color-secondary-shade: #0bb8cc;
+  --ion-color-secondary-tint: #24d6ea;
+
+  --ion-color-tertiary: #7044ff;
+  --ion-color-tertiary-rgb: 112,68,255;
+  --ion-color-tertiary-contrast: #ffffff;
+  --ion-color-tertiary-contrast-rgb: 255,255,255;
+  --ion-color-tertiary-shade: #633ce0;
+  --ion-color-tertiary-tint: #7e57ff;
+
+  --ion-color-success: #10dc60;
+  --ion-color-success-rgb: 16,220,96;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255,255,255;
+  --ion-color-success-shade: #0ec254;
+  --ion-color-success-tint: #28e070;
+
+  --ion-color-warning: #ffce00;
+  --ion-color-warning-rgb: 255,206,0;
+  --ion-color-warning-contrast: #ffffff;
+  --ion-color-warning-contrast-rgb: 255,255,255;
+  --ion-color-warning-shade: #e0b500;
+  --ion-color-warning-tint: #ffd31a;
+
+  --ion-color-danger: #f04141;
+  --ion-color-danger-rgb: 245,61,61;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255,255,255;
+  --ion-color-danger-shade: #d33939;
+  --ion-color-danger-tint: #f25454;
+
+  --ion-color-dark: #222428;
+  --ion-color-dark-rgb: 34,34,34;
+  --ion-color-dark-contrast: #ffffff;
+  --ion-color-dark-contrast-rgb: 255,255,255;
+  --ion-color-dark-shade: #1e2023;
+  --ion-color-dark-tint: #383a3e;
+
+  --ion-color-medium: #989aa2;
+  --ion-color-medium-rgb: 152,154,162;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255,255,255;
+  --ion-color-medium-shade: #86888f;
+  --ion-color-medium-tint: #a2a4ab;
+
+  --ion-color-light: #f4f5f8;
+  --ion-color-light-rgb: 244,244,244;
+  --ion-color-light-contrast: #000000;
+  --ion-color-light-contrast-rgb: 0,0,0;
+  --ion-color-light-shade: #d7d8da;
+  --ion-color-light-tint: #f5f6f9;
+  }
+
+  @font-face {
+  font-family: "Roboto";
+  src: local(Roboto Thin), url("./fonts/roboto/Roboto-Thin.woff2") format("woff2"), url("./fonts/roboto/Roboto-Thin.woff") format("woff");
+  font-weight: 100;
+  }
+
+  @font-face {
+  font-family: "Roboto";
+  src: local(Roboto Light), url("./fonts/roboto/Roboto-Light.woff2") format("woff2"), url("./fonts/roboto/Roboto-Light.woff") format("woff");
+  font-weight: 300;
+  }
+
+  @font-face {
+  font-family: "Roboto";
+  src: local(Roboto Regular), url("./fonts/roboto/Roboto-Regular.woff2") format("woff2"), url("./fonts/roboto/Roboto-Regular.woff") format("woff");
+  font-weight: 400;
+  }
+
+  @font-face {
+  font-family: "Roboto";
+  src: local(Roboto Medium), url("./fonts/roboto/Roboto-Medium.woff2") format("woff2"), url("./fonts/roboto/Roboto-Medium.woff") format("woff");
+  font-weight: 500;
+  }
+
+  @font-face {
+  font-family: "Roboto";
+  src: local(Roboto Bold), url("./fonts/roboto/Roboto-Bold.woff2") format("woff2"), url("./fonts/roboto/Roboto-Bold.woff") format("woff");
+  font-weight: 700;
+  }
+
+  /* responsive tables */
+  table { border: 1px solid #ccc; width: 100%; margin: 0; padding: 0; border-collapse: collapse; border-spacing: 0; }
+  table tr { border: 1px solid #ddd; padding: 5px; }
+  table th, table td { padding: 10px; text-align: center; }
+  table th { text-transform: uppercase; font-size: 14px; letter-spacing: 1px; }
+  table tr:hover { background-color: var(--ion-color-light);}
+
+  @media screen and (max-width: 600px) {
+    table { border: 0; }
+    table thead { display: none; }
+    table tr { margin-bottom: 10px; display: block; border-bottom: 2px solid #ddd; }
+    table td { display: block; text-align: right; font-size: 13px; border-bottom: 1px dotted #ccc; }
+    table td:last-child { border-bottom: 0; }
+    table td:before { content: attr(data-label); float: left; text-transform: uppercase; font-weight: bold; }
+  }

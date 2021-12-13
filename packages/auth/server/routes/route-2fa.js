@@ -4,19 +4,18 @@
  *   @author Clayton Gulick <clay@ratiosoftware.com>
  */
 const LoginController = require('../controllers/controller-login'),
-    Authorization = require('../helpers/helper-authorization'),
     RateLimiter = require('../helpers/helper-rate-limit'),
     Util = require('../helpers/helper-util');
-module.exports = (app) => {
+module.exports = (router) => {
 
     /**
      * Log in with a nonce token. Expected url param ?token=asdfasdfasdf
      */
-    app.route('/api/login/nonce')
+    route('/api/2fa')
         .get(
             //rate limit to three times per minute
             RateLimiter.limit(60 * 60 * 1000, 3), 
-            LoginController.loginWithNonce
+            Util.wrap(AuthController.get)
         )
         .post(
             //rate limit to once per 5 minutes
