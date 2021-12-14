@@ -8,7 +8,7 @@ let package_json = require('./package.json');
 let {CleanWebpackPlugin} = require('clean-webpack-plugin');
 let HtmlWebpackPlugin = require('html-webpack-plugin');
 let CopyWebpackPlugin = require('copy-webpack-plugin');
-const {GenerateSW} = require('workbox-webpack-plugin');
+//const {GenerateSW} = require('workbox-webpack-plugin');
 
 let webpack = require('webpack');
 let CLIENT_ID = process.env.CLIENT_ID || 'local';
@@ -35,12 +35,13 @@ let webpack_config = {
         new webpack.DefinePlugin({
             NODE_ENV: JSON.stringify(NODE_ENV),
             CLIENT_ID: JSON.stringify(CLIENT_ID),
+            APP_NAME: JSON.stringify(package_json.name),
             VERSION: JSON.stringify(package_json.version),
         }),
         //new CleanWebpackPlugin(),
         new HtmlWebpackPlugin(
             {
-                title: "Telos Admin",
+                title: "Telos Auth",
                 template: path.resolve(__dirname,'templates/app', 'index.hbs'),
                 filename: 'index.html',
                 chunks: ['app']

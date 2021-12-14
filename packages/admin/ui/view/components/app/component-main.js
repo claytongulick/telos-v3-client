@@ -33,7 +33,9 @@ class ComponentMain extends HTMLElement {
 
         this.version = VERSION;
         this.environment = NODE_ENV;
-        console.log(`Starting Kith And Kin Admin Application v${this.version} in ${this.environment} envioronment.`)
+        this.app_name = APP_NAME;
+
+        console.log(`Starting ${this.app_name} v${this.version} in ${this.environment} envioronment.`)
 
         this.notifications = [];
 

@@ -249,7 +249,7 @@ class Authentication {
                     data,
                     config.client_secret,
                     {
-                        issuer: 'app.kithandkin.app'
+                        issuer: process.env.HOSTNAME
                     },
                     (err, jwt) => {
                         if(err)
@@ -273,7 +273,7 @@ class Authentication {
                     jwt,
                     config.sessionSecret,
                     {
-                        issuer: 'app.kithandkin.app'
+                        issuer: process.env.HOSTNAME
                     },
                     (err, data) => {
                         if(err)

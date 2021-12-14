@@ -43,7 +43,6 @@ class SceneHome extends HTMLElement {
             </ion-header>
 
             <ion-content padding style="text-align: center;">
-                <h4>Welcome to Kith and Kin Admin Application!</h4>
                 <p></p>
             </ion-content>
         `;
