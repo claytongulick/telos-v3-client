@@ -14,10 +14,9 @@
  * @email clay@ratiosoftware.com
  */
 
-const User = require('../models/model-user'),
+const {User} = require('common/db/models'),
     config = require('../../env/config'),
     Authentication = require('./authentication'),
-    Nonce = require('../models/model-nonce'),
     passport = require('passport'),
     passport_jwt = require('passport-jwt'),
     passport_local = require('passport-local'),
@@ -125,31 +124,6 @@ function configureLocalStrategy() {
         }
     );
     passport.use(strategy);
-
-}
-
-function configureNonceStrategy() {
-    const strategy = new passport_custom(
-        (req, done) => {
-            let nonce = req.query.token;
-            
-            if(!nonce)
-                return done(null, false, 'Missing token');
-
-            (async () => {
-                let valid = await Authentication.validateNonce(nonce);
-                if(!valid) 
-                    return done(null, false, "Invalid token");
-                let jwt = await Authentication.consumeNonce(nonce, {headers: req.headers, ip: req.ip});
-                if(!jwt)
-                    return done(null, false, "Invalid or consumed nonce");
-
-                done(null, jwt);
-                }
-            )();
-        }
-    );
-    passport.use('nonce', strategy);
 
 }
 

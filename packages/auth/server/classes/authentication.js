@@ -5,12 +5,8 @@
  */
 'use strict';
 
-let User = require('../models/model-user');
-let Profile = require('../models/model-profile');
-let Nonce = require('../models/model-nonce');
 let JWT = require('jsonwebtoken');
 let uuid = require('uuid/v4');
-let Communication = require('../models/model-communication');
 let Encryption = require('./helper-encryption');
 let SMS = require('./helper-sms');
 let config = require('../../env/config');

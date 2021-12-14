@@ -19,9 +19,8 @@ let schema = {
      */
     username: {
         type: DataTypes.STRING,
-        unique: true,
+        unique: true, //adds an index automatically
         allowNull: false
-
     },
 
     /**
@@ -86,7 +85,9 @@ class User extends Model {
 module.exports = (sequelize) => {
     let model_options = {
         sequelize, // We need to pass the connection instance
-        modelName: 'application_user' // We need to choose the model name
+        modelName: 'application_user', // We need to choose the model name
+        createdAt: 'create_date',
+        updatedAt: 'update_date'
     }
 
     User.init(schema, model_options);

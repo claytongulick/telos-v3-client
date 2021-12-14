@@ -10,7 +10,6 @@ const Article = require('../models/model-article');
 const Block = require('../models/model-block');
 const Entity = require('../models/model-entity');
 const ACL = require('../helpers/helper-acl');
-const ObjectId = require('mongoose').Types.ObjectId;
 
 class Authorize {
 

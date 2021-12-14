@@ -41,7 +41,7 @@ let webpack_config = {
         //new CleanWebpackPlugin(),
         new HtmlWebpackPlugin(
             {
-                title: "Telos Admin",
+                title: "Telos Auth",
                 template: path.resolve(__dirname,'templates/app', 'index.hbs'),
                 filename: 'index.html',
                 chunks: ['app']
