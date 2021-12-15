@@ -77,19 +77,21 @@ let schema = {
     otp_sid: DataTypes.STRING
 }
 
-
+/**
+ * @type {typeof import('sequelize').Model}
+ */
 class User extends Model {
 
 }
 
-module.exports = (sequelize) => {
-    let model_options = {
-        sequelize, // We need to pass the connection instance
-        modelName: 'application_user', // We need to choose the model name
-        createdAt: 'create_date',
-        updatedAt: 'update_date'
-    }
+let sequelize = require('../sequelize')(process.env.CLIENT_DB_URI);
 
-    User.init(schema, model_options);
-    return User;
+let model_options = {
+    sequelize, // We need to pass the connection instance
+    modelName: 'application_user', // We need to choose the model name
+    createdAt: 'create_date',
+    updatedAt: 'update_date'
 }
+
+User.init(schema, model_options);
+module.exports = User;

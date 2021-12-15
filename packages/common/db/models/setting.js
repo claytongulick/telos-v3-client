@@ -1,5 +1,19 @@
 const { DataTypes, Model } = require('sequelize');
 
+/**
+ * @typedef {Object} SettingSchema The schema for a setting row
+ * @property {number} id
+ * @property {string} name
+ * @property {string} title
+ * @property {string} help_text
+ * @property {string} type
+ * @property {string} value_string
+ * @property {number} value_number
+ * @property {object} value_object
+ * @property {Date} value_date
+ * @property {boolean} value_boolean
+ * @property {string} set_by
+ */
 let schema = {
     /**
      * The unique id for the setting
@@ -44,7 +58,7 @@ let schema = {
         allowNull: false,
         validator: {
             isIn: {
-                args: [['string','number','boolean','date','json']],
+                args: [['string','number','boolean','date','object']],
                 msg: 'Type must be string or json'
             }
         }
@@ -73,7 +87,7 @@ let schema = {
     /**
      * If type is json, this will hold the value
      */
-    value_json: {
+    value_object: {
         type: DataTypes.JSONB,
     },
 
@@ -84,18 +98,18 @@ let schema = {
 }
 
 
-class User extends Model {
+class Setting extends Model {
 
 }
 
-module.exports = (sequelize) => {
-    let model_options = {
-        sequelize, // We need to pass the connection instance
-        modelName: 'setting', // We need to choose the model name
-        createdAt: 'create_date',
-        updatedAt: 'update_date'
-    }
-
-    User.init(schema, model_options);
-    return User;
+let sequelize = require('../sequelize')(process.env.CLIENT_DB_URI);
+let model_options = {
+    sequelize, // We need to pass the connection instance
+    modelName: 'setting', // We need to choose the model name
+    createdAt: 'create_date',
+    updatedAt: 'update_date'
 }
+
+Setting.init(schema, model_options);
+
+module.exports = Setting;
