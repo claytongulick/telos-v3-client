@@ -18,6 +18,8 @@ program.version(package_json.version);
 program
     .command('database', 'Client database commands', { executableFile: 'cli-database' })
     .command('app', 'App management commands', { executableFile: 'cli-app' })
+    .command('user', 'User management commands', { executableFile: 'cli-user' })
+    .command('fhir', 'FHIR application commands', { executableFile: 'cli-fhir' })
     ;
 
 program.parse(process.argv);

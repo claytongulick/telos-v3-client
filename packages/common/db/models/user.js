@@ -27,7 +27,10 @@ let schema = {
      * In most cases, this will be the same as the username. In the cases where we have a system that requires an alternate username, 
      * we have the separate email address for redundancy
      */
-    email_address: DataTypes.STRING,
+    email_address: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
 
     first_name: {
         type: DataTypes.STRING,
@@ -37,6 +40,13 @@ let schema = {
     last_name: {
         type: DataTypes.STRING,
         allowNull: false
+    },
+
+    /**
+     * The mobile phone number for the user. This will be used to send SMS messages.
+     */
+    phone: {
+        type: DataTypes.STRING,
     },
 
     /**

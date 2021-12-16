@@ -5,7 +5,7 @@
  */
 const program = require('commander');
 const package_json = require('../package.json');
-const App = require('../commands/app');
+const AppCommands = require('../commands/app');
 
 const APP_NAMES = ['admin','patient','provider','reporting','fhir'];
 
@@ -19,7 +19,7 @@ async function main() {
         .option('-n, --name <name>', 'perform all build steps on the specified app name. One of: ' + APP_NAMES.join(','))
         .option('-a, --all', 'build all apps')
         .action(async (options, command) => {
-            await App.build(options);
+            await AppCommands.build(options);
         });
 
     program
@@ -28,14 +28,14 @@ async function main() {
         .option('-n, --name <name>', 'start specified app, one of: ' + APP_NAMES.join(','))
         .option('-a, --all', 'start all apps')
         .action(async (options, command) => {
-            await App.start(options);
+            await AppCommands.start(options);
         });
 
     program
         .command('stop')
         .description('Stop all running apps')
         .action(async (options, command) => {
-            await App.stop(options);
+            await AppCommands.stop(options);
         });
 
 

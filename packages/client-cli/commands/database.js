@@ -2,6 +2,12 @@ const Models = require('common/db/models');
 
 let init_functions = {
     users: async function() {
+        let User = Models.User;
+        let users = require('common/db/fixtures/users');
+        for(let new_user of users) {
+            let user = await User.create(user);
+            user.setPassword()
+        }
 
     },
 
@@ -15,7 +21,7 @@ let init_functions = {
     }
 }
 
-class Database {
+class DatabaseCommands {
     static async create(options) {
         const sequelize = await require('common/db/sequelize').connect(process.env.CLIENT_DB_URI);
         await sequelize.sync({ force: options.force });
@@ -44,4 +50,4 @@ class Database {
 
 }
 
-module.exports = Database;
+module.exports = DatabaseCommands;

@@ -1,10 +1,10 @@
 /**
  * Class that handles application building.
  */
-class App {
+class AppCommands {
     static async build(options) {
 
     }
 }
 
-module.exports = App;
+module.exports = AppCommands;

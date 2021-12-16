@@ -5,7 +5,7 @@
  */
 const program = require('commander');
 const package_json = require('../package.json');
-const Database = require('../commands/database');
+const DatabaseCommands = require('../commands/database');
 
 //set the command line version to match package.json
 program.version(package_json.version);
@@ -16,14 +16,14 @@ async function main() {
         .description('Create the client database schema')
         .option('-f, --force', 'Drop existing tables if they exist and recreate them')
         .action(async (options, command) => {
-            await Database.create(options);
+            await DatabaseCommands.create(options);
         });
 
     program
         .command('drop')
         .description('Drop the client database')
         .action(async () => {
-            await Database.drop();
+            await DatabaseCommands.drop();
         });
 
     program
@@ -32,7 +32,7 @@ async function main() {
         .option("-a, --all", "Initialize database with all fixtures. This will delete existing data in the tables and replace it with the fixture data.")
         .option("-n, --name", "Initialize database with specified fixture name. This will replace existing data in the table.")
         .action(async (options) => {
-            await Database.init(options);
+            await DatabaseCommands.init(options);
         });
 
     program.parseAsync(process.argv);
