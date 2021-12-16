@@ -90,4 +90,59 @@ class Settings {
 
 }
 
+const config = {
+    'client-title': {
+        name: 'client-title',
+        title: 'Organization display name',
+        help_text: 'This is the name of your company. It is displayed througout the application in various places.',
+        type: 'string',
+        value_string: 'RPM Enabled Practice',
+        /**
+         * 
+         * @param {string} value 
+         * @returns 
+         */
+        validate: (value) => {
+            if(!(value))
+                return false;
+            if(value.length < 2)
+                return false;
+            return true;
+        }
+    },
+    'enabled-auth-flows': {
+        name: 'enabled-auth-flows',
+        title: 'Enabled authentication flows',
+        help_text: `A comma separated list of authentication methods that a user is allowed to use to log into the application. 
+        Valid values are: 
+        - password
+        The user logs in with a traditional username/password combination.
+        - otp
+        The user is sent a one time password to their mobile device which is used to log in to the application.
+        - 2fa
+        Two factor authentication. The user logs in with a username/password and is then sent a one time password.
+        - webauthn
+        Enable advanced security with supported devices. Examples include apple FaceID, Windows Hello, Android Fingerprint
+        - oid
+        Log in with an open id SSO provider. Requires custom configuration.
+        - saml
+        Log in with a SAML SSO provider. Requires custom configuration.
+        `,
+        type: 'string',
+        value_string: 'password, otp, webauthn',
+        validate: (value) => {
+            let valid_options = ['password', 'otp', '2fa', 'webauthn','oid','saml'];
+            let values = value.split(',');
+            for(let v of values) {
+                if(!(valid_options.includes(v.trim())))
+                    return false;
+            }
+            return true;
+        }
+    }
+
+}
+
+Settings.config = config;
+
 module.exports = Settings;

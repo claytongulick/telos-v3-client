@@ -3,16 +3,38 @@
 /**
  * bin file to execute commands
  */
- const program = require('commander');
- const package_json = require('../package.json');
- 
- //set the command line version to match package.json
- program.version(package_json.version);
- 
- program
-    .command('create', 'Create the database schema', {executableFile: 'cli-database-create'})
-    .command('drop', 'Drop the database or one or more tables', {executableFile: 'cli-database-drop'})
-    .command('init', 'Initialize the database with fixture data', {executableFile: 'cli-database-init'})
-     ;
- 
- program.parse(process.argv);
+const program = require('commander');
+const package_json = require('../package.json');
+const Database = require('../commands/database');
+
+//set the command line version to match package.json
+program.version(package_json.version);
+
+async function main() {
+    program
+        .command('create')
+        .description('Create the client database schema')
+        .option('-f, --force', 'Drop existing tables if they exist and recreate them')
+        .action(async (options, command) => {
+            await Database.create(options);
+        });
+
+    program
+        .command('drop')
+        .description('Drop the client database')
+        .action(async () => {
+            await Database.drop();
+        });
+
+    program
+        .command('init')
+        .description('Initialize the database with fixture data')
+        .option("-a, --all", "Initialize database with all fixtures. This will delete existing data in the tables and replace it with the fixture data.")
+        .option("-n, --name", "Initialize database with specified fixture name. This will replace existing data in the table.")
+        .action(async (options) => {
+            await Database.init(options);
+        });
+
+    program.parseAsync(process.argv);
+}
+main();

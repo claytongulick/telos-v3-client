@@ -47,7 +47,7 @@ let schema = {
      * Help text to show along with the setting in the user interface
      */
     help_text: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
     },
 
     /**
@@ -58,7 +58,7 @@ let schema = {
         allowNull: false,
         validator: {
             isIn: {
-                args: [['string','number','boolean','date','object']],
+                args: [['string','number','boolean','date','object','file']],
                 msg: 'Type must be string or json'
             }
         }

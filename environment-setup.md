@@ -2,19 +2,21 @@
 - install java & jdk
 - install maven
 - install postgres 14
+- create 'app' database user with password
+- create 'client' database with 'app' as owner
 - install nodejs
 - install certbot for lets encrypt
-- create app user and home folder
+- create 'app' operating system user and home folder
 - git clone telos-v3 repo into /home/app/deploy
+- npm install node deps from /home/app/deploy this will install all deps in packages automatically using npm workspaces
+- npm link client-cli package as root to provide the telos cli globally
+- build all node apps via 'telos app build --all'
 - set up ssl certificates via let's encrypt based on CLIENT_ID environment variable and whitelabel (use as dns)
 - build hapi fhir server
 - install superset and deps
-- npm install node deps
-- npm install lerna -g
-- lerna bootstrap to install all node deps and link repos
-- build all node apps
 - run systemd setup to enable services in ./ops/systemd
-- create databases and database users
+- run 'telos database create' to create databases
+- run 'telos database init' to set up initial data and database users
 - run sequelize db setup and creation
 - run db seeds
 - set up cron table in ./ops/cron

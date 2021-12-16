@@ -3,15 +3,21 @@
 /**
  * bin file to execute commands
  */
- const program = require('commander');
- const package_json = require('../package.json');
- 
- //set the command line version to match package.json
- program.version(package_json.version);
- 
- program
-    .command('database', 'Client database commands', {executableFile: 'cli-database'})
-     ;
- 
- program.parse(process.argv);
- 
+const program = require('commander');
+const package_json = require('../package.json');
+const path = require('path');
+
+let dotenv = require('dotenv');
+dotenv.config({
+    path: path.resolve(__dirname,'..','..','..','.env')
+});
+
+//set the command line version to match package.json
+program.version(package_json.version);
+
+program
+    .command('database', 'Client database commands', { executableFile: 'cli-database' })
+    .command('app', 'App management commands', { executableFile: 'cli-app' })
+    ;
+
+program.parse(process.argv);
