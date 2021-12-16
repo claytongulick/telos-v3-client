@@ -84,7 +84,7 @@ class User extends Model {
 
 }
 
-let sequelize = require('../sequelize')(process.env.CLIENT_DB_URI);
+let sequelize = require('../sequelize').get(process.env.CLIENT_DB_URI);
 
 let model_options = {
     sequelize, // We need to pass the connection instance

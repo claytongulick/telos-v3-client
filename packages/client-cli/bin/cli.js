@@ -10,7 +10,7 @@
  program.version(package_json.version);
  
  program
-    .command('database', 'Client database commands')
+    .command('database', 'Client database commands', {executableFile: 'cli-database'})
      ;
  
  program.parse(process.argv);

@@ -10,9 +10,9 @@
  program.version(package_json.version);
  
  program
-    .command('create', 'Create the database schema')
-    .command('drop', 'Drop the database or one or more tables')
-    .command('init', 'Initialize the database with fixture data')
+    .command('create', 'Create the database schema', {executableFile: 'cli-database-create'})
+    .command('drop', 'Drop the database or one or more tables', {executableFile: 'cli-database-drop'})
+    .command('init', 'Initialize the database with fixture data', {executableFile: 'cli-database-init'})
      ;
  
  program.parse(process.argv);
