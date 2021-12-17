@@ -9,7 +9,7 @@
 //require('newrelic');
 let dotenv = require('dotenv');
 dotenv.config({
-    path: '../../.env'
+    path: path.resolve(__dirname,'..','..','.env')
 });
 let config = require('./config/config');
 let logger = require('common/server/logging').getLogger(config);

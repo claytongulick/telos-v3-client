@@ -50,6 +50,20 @@ let schema = {
     },
 
     /**
+     * An array of user roles
+     */
+    roles: {
+        type: DataTypes.ARRAY(DataTypes.STRING),
+        allowNull: false,
+        validator: {
+            isIn: {
+                args: [['admin','provider','patient']],
+                msg: 'Must be a valid role'
+            }
+        }
+    },
+
+    /**
      * If this user is associated with a FHIR entity, this is the URL to the FHIR resource
      */
     resource: DataTypes.STRING,
@@ -84,13 +98,34 @@ let schema = {
     /**
      * The session id that was created from consuming the nonce
      */
-    otp_sid: DataTypes.STRING
+    otp_sid: DataTypes.STRING,
+
+    //password fields
+    hash: {
+        type: DataTypes.STRING(1024)
+    },
+
+    salt: {
+        type: DataTypes.STRING
+    }
 }
 
 /**
  * @type {typeof import('sequelize').Model}
  */
 class User extends Model {
+    async setPassword(password) {
+        let Encryption = require('../../server/encryption');
+        let {hash, salt} = await Encryption.hash(password);
+        this.hash = hash;
+        this.salt = salt;
+        await this.save();
+    }
+
+    async checkPassword(password) {
+        let Encryption = require('../../server/encryption');
+        return await Encryption.verifyPassword(this.hash, password, this.salt);
+    }
 
 }
 

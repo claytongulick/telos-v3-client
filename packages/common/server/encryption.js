@@ -5,16 +5,26 @@
  */
 const crypto = require('crypto');
 const util = require('util');
-const bcrypt = require('bcryptjs');
 
-const config = require('../../env/config');
+/**
+ * Crypto config is common and shared between all services
+ */
+let config = {
+    digest: 'sha512',
+    hash_iterations: 25000,
+    hash_key_length: 512,
+    hash_encoding: 'hex',
+    salt_length: 32,
+    //this is the secret used for symmetric encryption
+    encryption_secret: process.env.CLIENT_SECRET,
+};
 
 /**
  * Utility function to simplify and unify all crypto
  */
 class Encryption {
     static encrypt(text) {
-        let cipher = crypto.createCipher('aes-256-cbc', config.crypto.encryption_secret);
+        let cipher = crypto.createCipher('aes-256-cbc', config.encryption_secret);
         let crypted = cipher.update(text, 'utf8', 'hex');
         crypted += cipher.final('hex');
         return crypted;
@@ -23,30 +33,45 @@ class Encryption {
 
     static decrypt(text) {
         if (text === null || typeof text === 'undefined') { return text; };
-        let decipher = crypto.createDecipher('aes-256-cbc', config.crypto.encryption_secret);
+        let decipher = crypto.createDecipher('aes-256-cbc', config.encryption_secret);
         let dec = decipher.update(text, 'hex', 'utf8');
         dec += decipher.final('utf8');
         return dec;
     }
 
     static async hash(text) {
-        let buf = await util.promisify(crypto.randomBytes)(config.crypto.salt_length);
+        let buf = await util.promisify(crypto.randomBytes)(config.salt_length);
 
         // create new salt value for hashing the password:
-        let salt = buf.toString(config.crypto.hash_encoding);
+        let salt = buf.toString(config.hash_encoding);
 
         let raw_hash = await util.promisify(crypto.pbkdf2)(text,
             salt,
-            config.crypto.hash_iterations,
-            config.crypto.hash_key_length,
-            config.crypto.digest
+            config.hash_iterations,
+            config.hash_key_length,
+            config.digest
         );
 
-        let hash = raw_hash.toString(config.crypto.hash_encoding);
+        let hash = raw_hash.toString(config.hash_encoding);
         return {
             hash,
             salt
         }
+    }
+
+    static async verifyPassword(password_hash, password, salt) {
+        let raw_hash = await util.promisify(crypto.pbkdf2)(password,
+            salt,
+            config.hash_iterations,
+            config.hash_key_length,
+            config.digest);
+
+        let string_hash = raw_hash.toString(config.hash_encoding);
+
+        if(password_hash === string_hash)
+            return true;
+
+        return false;
     }
 
     static cryptoRandomString(length) {
@@ -63,9 +88,6 @@ class Encryption {
         return otp;
     };
 
-    static async bcrypt(text) {
-
-    }
 }
 
 module.exports = Encryption;

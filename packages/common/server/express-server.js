@@ -18,7 +18,8 @@ let express = require('express'),
     path = require('path'),
     redis = require('redis');
     session = require('express-session');
-    RedisStore = require('connect-redis')(session);
+    pg_store = require('connect-pg-simple')(session);
+    program = require('commander');
     rfs = require('rotating-file-stream');
 
 let http_proxy = require('http-proxy');
@@ -44,6 +45,10 @@ let proxy = http_proxy.createProxyServer({});
  * @returns 
  */
 module.exports = function (logger, routes, config, middleware) {
+    program
+        .option('-a, --auth <username>', 'Force all requests that come in to the express server to be authenticated as the specified user. This can only be used in local and development environments.');
+    program.parse();
+    let options = program.opts();
 
     // Initialize express app
     let app = express();
@@ -58,7 +63,8 @@ module.exports = function (logger, routes, config, middleware) {
     app.use(helmet.dnsPrefetchControl());
     app.use(helmet.expectCt());
     app.use(helmet.hidePoweredBy());
-    app.use(helmet.hsts());
+    if(config.force_ssl)
+        app.use(helmet.hsts());
     app.use(helmet.ieNoOpen());
     app.use(helmet.noSniff());
     app.use(helmet.permittedCrossDomainPolicies());
@@ -119,6 +125,7 @@ module.exports = function (logger, routes, config, middleware) {
             secret: process.env.CLIENT_SECRET,
             name: 'telos.sid',
             saveUninitialized: false,
+            resave: false,
             cookie: {
                 httpOnly: true,
                 secure: true,
@@ -128,15 +135,51 @@ module.exports = function (logger, routes, config, middleware) {
             }
         }
 
-        if(process.env.ENABLE_REDIS_SESSION) {
-            let redis_client = redis.createClient({
-                host: process.env.REDIS_HOST
+        
+        if(process.env.ENABLE_PG_SESSION) {
+            let pg = require('pg');
+            let pool = new pg.Pool({
+                connectionTimeoutMillis: 2000,
+                connectionString: process.env.SESSION_DB_URI
             });
-            session_options.store = new RedisStore({client: redis_client});
+            session_options.store = new pg_store()
         }
 
         let dynamic_session = session(session_options);
         dynamic_session(req, res, next);
+    });
+
+    //if the server was launched with an override-authentication parameter, force auth as the specified user
+    //this is used for debugging and development purposes only
+    app.use(async (req, res, next) => {
+        //only allow this option in local or development environments
+        if(!(['local','development'].includes(process.env.NODE_ENV))) {
+            return next();
+        }
+
+        let username = options.auth;
+        if(!username)
+            return next();
+
+        if(req?.session?.user?.username == username)
+            return next(); //we already have an authenticated session
+
+        let User = require('common/db/models/user');
+        let user = await User.findOne({where: {username}});
+        if(!user)
+            return next('Invalid or unknown auth username: ' + username);
+        /** @type {AuthSession} */
+        let auth_session = {
+            client_id: 'local',
+            flow: 'password',
+            session_start_date: new Date(),
+            session_trusted_date: new Date(),
+            status: 'complete',
+            trusted: true,
+            user: user
+        };
+        Object.assign(req.session, auth_session);
+        next();
     });
 
     //allow the use of modern http verbs for older clients that might not support them (PUT, etc...)

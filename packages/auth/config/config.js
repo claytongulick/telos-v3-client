@@ -114,15 +114,6 @@ let config = {
     attachment_path: './public',
     client_secret: process.env.CLIENT_SECRET,
     disable_rate_limit: true,
-    crypto: {
-        digest: 'sha512',
-        hash_iterations: 25000,
-        hash_key_length: 512,
-        hash_encoding: 'hex',
-        salt_length: 32,
-        //this is the secret used for symmetric encryption
-        encryption_secret: process.env.CLIENT_SECRET,
-    },
     /** @type {import('../../common/server/logging').LoggingConfig} */
     logging: {
         //give the logger access to package.json so that it can log out messages

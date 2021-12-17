@@ -27,6 +27,8 @@ async function main() {
         .description('Start one or more apps')
         .option('-n, --name <name>', 'start specified app, one of: ' + APP_NAMES.join(','))
         .option('-a, --all', 'start all apps')
+        .option('-p, --proxy', 'use the proxy server and full authentication')
+        .option('-u, --user <username>', 'run without the proxy and authenticate as the specified user')
         .action(async (options, command) => {
             await AppCommands.start(options);
         });

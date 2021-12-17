@@ -5,8 +5,8 @@ let init_functions = {
         let User = Models.User;
         let users = require('common/db/fixtures/users');
         for(let new_user of users) {
-            let user = await User.create(user);
-            user.setPassword()
+            let user = await User.create(new_user);
+            await user.setPassword(new_user.password)
         }
 
     },
@@ -21,16 +21,34 @@ let init_functions = {
     }
 }
 
+let destroy_functions = {
+    users: async function() {
+        let User = Models.User;
+        await User.destroy({truncate: true});
+    },
+
+    settings:  async function() {
+        let Setting = Models.Setting;
+        await Setting.destroy({truncate: true});
+    }
+}
+
 class DatabaseCommands {
     static async create(options) {
         const sequelize = await require('common/db/sequelize').connect(process.env.CLIENT_DB_URI);
         await sequelize.sync({ force: options.force });
+        sequelize.close();
     }
 
     static async init(options) {
         let valid_fixtures = ['users','settings'];
 
         if(options.all) {
+            if(options.destroy) {
+                for(let fixture of valid_fixtures) {
+                    await destroy_functions[fixture]();
+                }
+            }
             for(let fixture of valid_fixtures) {
                 await init_functions[fixture]();
             }
@@ -41,11 +59,15 @@ class DatabaseCommands {
             if(!valid_fixtures.includes(options.name))
                 throw new Error("Invalid fuxture name: " + options.name)
 
+            if(options.destroy) {
+                await destroy_functions[options.name]();
+            }
             await init_functions[options.name]();
             return;
         }
 
         console.error("Either --all or --name must be specified");
+        sequelize.close();
     }
 
 }
