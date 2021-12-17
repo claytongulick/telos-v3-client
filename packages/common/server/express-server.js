@@ -49,6 +49,8 @@ module.exports = function (logger, routes, config, middleware) {
         .option('-a, --auth <username>', 'Force all requests that come in to the express server to be authenticated as the specified user. This can only be used in local and development environments.');
     program.parse();
     let options = program.opts();
+    if(options.auth)
+        logger.warn("Forcing authentication to:" + username);
 
     // Initialize express app
     let app = express();

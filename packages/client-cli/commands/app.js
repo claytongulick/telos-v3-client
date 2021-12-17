@@ -28,28 +28,31 @@ function buildApp(app_name, options) {
 function startApp(name, options) {
     let inspect = '';
     let java_debug = '';
+    let auth = '';
+    if(options.user)
+        auth = `--auth ${options.user}`;
     if(options.debug) {
         inspect = '--inspect';
         java_debug = '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=1044';
     }
     switch(name) {
         case 'auth':
-            auth_process = shell.exec(`node ${inspect} ./auth/server.js`,{async: true});
+            auth_process = shell.exec(`node ${inspect} ./auth/server.js ${auth}`,{async: true});
             break;
         case 'admin':
-            admin_process = shell.exec(`node ${inspect} ./admin/server.js`,{async: true});
+            admin_process = shell.exec(`node ${inspect} ./admin/server.js ${auth}`,{async: true});
             break;
         case 'patient':
-            patient_process = shell.exec(`node ${inspect} ./patient/server.js`,{async: true});
+            patient_process = shell.exec(`node ${inspect} ./patient/server.js ${auth}`,{async: true});
             break;
         case 'provider':
-            provider_process = shell.exec(`node ${inspect} ./provider/server.js`,{async: true});
+            provider_process = shell.exec(`node ${inspect} ./provider/server.js ${auth}`,{async: true});
             break;
         case 'proxy':
-            proxy_process = shell.exec(`node ${inspect} ./proxy/server.js`,{async: true});
+            proxy_process = shell.exec(`node ${inspect} ./proxy/server.js ${auth}`,{async: true});
             break;
         case 'fhir':
-            fhir_process = shell.exec(`java ${java_debug} -jar ./fhir-server/target/fhir-server.war`,{async: true});
+            fhir_process = shell.exec(`java ${java_debug} -jar ../fhir-server/target/fhir-server.war`,{async: true});
             break;
         case 'superset':
             superset_process = shell.exec(`gunicorn -k gevent --timeout 120 -b 127.0.0.1:5000 --limit-request-line 0 --limit-request-field_size 0 "superset.app:create_app()"`, {async: true});

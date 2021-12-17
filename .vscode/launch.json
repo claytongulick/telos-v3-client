@@ -13,8 +13,8 @@
             ],
             "outputCapture": "std",
             "autoAttachChildProcesses": true,
-            "program": "${workspaceFolder}/packages/admin/server.js",
-            "args": ["-a","admin@teloshs.com"]
+            "program": "telos",
+            "args": ["app","start","admin","--debug","--user","admin@teloshs.com"]
         }
     ]
 }
