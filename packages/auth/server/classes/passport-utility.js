@@ -15,7 +15,7 @@
  */
 
 const {User} = require('common/db/models'),
-    config = require('../../config/config'),
+    config = require('../../env/config'),
     Authentication = require('./authentication'),
     passport = require('passport'),
     passport_jwt = require('passport-jwt'),

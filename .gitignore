@@ -66,6 +66,8 @@ typings/
 
 uploads
 
+dist
+
 protected_media
 .DS_Store
 *.DS_Store
