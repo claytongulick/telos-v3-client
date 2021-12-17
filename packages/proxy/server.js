@@ -8,6 +8,7 @@
 **/
 //require('newrelic');
 let dotenv = require('dotenv');
+let path = require('path');
 dotenv.config({
     path: path.resolve(__dirname,'..','..','.env')
 });
@@ -18,7 +19,7 @@ let routes = require('./server/routes');
 let ExpressServer = require('common/server/express-server');
 let http_proxy = require('http-proxy');
 let proxy = http_proxy.createProxyServer({});
-let sites = require('./sites');
+let sites = require('./server/sites');
 
 let proxy_middleware = async (req, res, next) => {
     //set the proxy object on the request so that it's available to all the site proxies

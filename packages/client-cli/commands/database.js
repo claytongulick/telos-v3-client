@@ -41,6 +41,7 @@ class DatabaseCommands {
     }
 
     static async init(options) {
+        const sequelize = await require('common/db/sequelize').connect(process.env.CLIENT_DB_URI);
         let valid_fixtures = ['users','settings'];
 
         if(options.all) {
@@ -52,6 +53,7 @@ class DatabaseCommands {
             for(let fixture of valid_fixtures) {
                 await init_functions[fixture]();
             }
+            sequelize.close();
             return;
         }
 
@@ -63,11 +65,11 @@ class DatabaseCommands {
                 await destroy_functions[options.name]();
             }
             await init_functions[options.name]();
+            sequelize.close();
             return;
         }
 
         console.error("Either --all or --name must be specified");
-        sequelize.close();
     }
 
 }

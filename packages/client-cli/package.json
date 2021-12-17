@@ -15,6 +15,7 @@
     "commander": "^8.3.0",
     "connect-pg-simple": "^7.0.0",
     "dotenv": "^10.0.0",
-    "express-session": "^1.17.2"
+    "express-session": "^1.17.2",
+    "shelljs": "^0.8.4"
   }
 }

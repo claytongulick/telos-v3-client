@@ -68,6 +68,20 @@ let schema = {
      */
     resource: DataTypes.STRING,
 
+    /**
+     * The current status of the user's account
+     */
+    account_status: {
+        type: DataTypes.STRING,
+        defaultValue: 'active',
+        allowNull: false,
+        validator: {
+            isIn: {
+                args: [['active','locked','inactive','flagged']]
+            }
+        }
+    },
+
     //one-time-password fields
 
     /**

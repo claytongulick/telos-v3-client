@@ -41,7 +41,7 @@ async function main() {
             await UserCommands.unlock(username, options);
         });
 
-    let password_command = program.Command('password')
+    let password_command = new program.Command('password')
         .description('Manage a user password');
     password_command
         .command('set')
