@@ -5,282 +5,111 @@
  */
 'use strict';
 
-let JWT = require('jsonwebtoken');
 let uuid = require('uuid/v4');
-let Encryption = require('./helper-encryption');
-let SMS = require('./helper-sms');
-let config = require('../../env/config');
+let Encryption = require('common/server/encryption');
+let SMS = require('common/server/sms');
+let User = require('common/db/models/user');
+let config = require('../../config/config');
+let util = require('util');
+const Activity = require('common/db/models/activity');
 
+/**
+ * Utility class for user authentication
+ * 
+ * @typedef {Object} AuthSession the session object describing the authentication status and the user
+ * @property {string} flow The authentication flow used to authenticate the session
+ * @property {string} status The current step in the authentication flow
+ * @property {boolean} trusted Whether the session has been fully authenticated and all steps completed
+ * @property {string} client_id The client id for the authenticated user
+ * @property {Date} session_start_date The date/time when the session was started
+ * @property {Date} session_trusted_date The date/time when the authentication was completed and the session was upgraded to "trusted"
+ * @property {Object} user The authenticated user
+ * @property {Number} user.id The user id
+ * @property {string} user.username The unique username for the user
+ * @property {string} user.resource The FHIR resource, if any, for the user
+ * @property {Array} user.roles The list of roles the user has, i.e. 'admin','practitioner','patient', etc...
+ */
 class Authentication {
 
-    static async setOTP(user_id) {
-        let user = await User.findById(user_id, '_id otp');
-        if(!user)
-            throw new Error("Invalid user_id");
-
-        let otp = await Authentication.createOTP();
-        user.otp = otp;
-        await user.save();
-        return otp;
-    }
-
-    static async authenticateOTP(user_id, code, info) {
-        let user = await User.findById(user_id, '_id otp');
-        if(!user)
-            throw new Error("Invalid user_id");
-
-        let valid = await Authentication.validateOTP(user.otp, code);
-
-        if(!valid) {
-            user.otp.attempts += 1;
-            await user.save();
-            return false;
-        }
-
-        //the otp is valid. we're going to create a nonce for this login on the backend so that we can
-        //kill the JWT later, if needed
-        let nonce = await Authentication.createLoginNonce(user_id, {otp: true})
-        user.otp.nonce = nonce._id;
-        await user.save();
-
-        let jwt = await Authentication.consumeNonce(nonce.nonce, {otp: true, ...info});
-        return jwt;
-    }
-
-    /**
-     * Create a one-time-password structure, including expiration
-     * @param {*} user_id 
-     */
-    static async createOTP() {
-        let code_length = 6;
-        //use a cryptographically strong generation algorithm for code creation. Math.random() won't cut it
-        let code = Encryption.cryptoRandomString(code_length);
-
-        let otp = {
-            code: code, //the generated code
-            created_date: new Date(), //used to expire the OTP. Expiration is 3 minutes.
-            attempts: 0, //we allow 3 attempts before a new code needs to be generated
-            consumed: false, //this has not been used yet
-            consumed_date: null
-        }
-
-        return otp;
-    }
-
-    static async validateOTP(otp, code) {
-        if(!otp)
-            return false;
-
-        if(otp.consumed)
-            return false;
-
-        if(otp.attempts >= 3)
-            return false;
-
-        let ticks = new Date() - new Date(otp.created_date);
-        let expiration = 1000 * 60 * 3; //three minutes in ms
-        if(ticks > expiration)
-            return false;
-
-        if(otp.code !== code)
-            return false;
-
-        //passed all checks
-        return true;
-
-    }
-
-    /**
-     * Create a nonce for the given user id that can be used later to issue a JWT
-     * @param user_id
-     * @returns {Promise.<void>}
-     */
-    static async createLoginNonce(user_id, data) {
-        let user = await User.findOne({_id: user_id});
-        if(!user)
-            throw new Error('Invalid user id');
-
-        if(user.account_status !== 'active')
-            throw new Error('User account is ' + user.account_status);
-
-        let token = uuid();
-
-        let nonce = new Nonce({
-            nonce: token,
-            create_date: new Date(),
-            is_consumed: false,
-            is_valid: true,
+    static async startAuthFlow(req, user, flow) {
+        /** @property {AuthSession} session */
+        let session = req.session;
+        session.client_id = process.env.CLIENT_ID;
+        session.flow = flow;
+        session.session_start_date = new Date();
+        session.session_trusted_date = new Date();
+        session.status = "started";
+        session.trusted = false;
+        session.user = {};
+        session.user.id = user.id;
+        session.user.resource = user.resource;
+        session.user.roles = user.roles;
+        session.user.username = user.username;
+        await Activity.create({
+            type: 'auth',
+            user_id: user.id,
+            client_id: session.client_id,
             data: {
-                sub: user.id,
-                nonce: token,
-                ...data
+                step: "start",
+                flow,
+                headers: req.headers
+            }
+        })
+    }
+
+    static async failAuthFlow(req, user, flow, reason) {
+        /** @type AuthSession */
+        let session = req.session;
+
+        if(flow !== session.flow)
+            throw new Error("Invalid flow");
+
+        if(user.id !== session.user.id)
+            throw new Error("Invalid user");
+
+        let destroySession = util.promisify(session.destroy).bind(session);
+        await destroySession();
+        await Activity.create({
+            type: 'auth',
+            user_id: user.id,
+            client_id: session.client_id,
+            data: {
+                step: "fail",
+                flow,
+                reason,
+                headers: req.headers
             }
         });
 
-        await nonce.save();
-
-        return nonce;
     }
 
-    /**
-     * Consume a nonce and return a JWT
-     * @param nonce
-     * @param info
-     * @returns {Promise.<boolean>}
-     */
-    static async consumeNonce(token, info) {
-        let nonce = await Nonce.findOne({nonce: token});
-        let allow = true;
-        let reason = '';
-        if(!nonce)
-            return false;
-        if(!nonce.is_valid) {
-            allow = false;
-            reason = "is_valid set to false";
-        }
-        if(nonce.single_use)
-            if(nonce.is_consumed) {
-                allow = false;
-                reason = "is_consumed set to true";
+    static async completeAuthFlow(req, user, flow) {
+        /** @type AuthSession */
+        let session = req.session;
+
+        if(flow !== session.flow)
+            throw new Error("Invalid flow");
+
+        if(user.id !== session.user.id)
+            throw new Error("Invalid user");
+
+        session.status = "complete";
+        session.trusted = true;
+        session.session_trusted_date = new Date();
+
+        await Activity.create({
+            type: 'auth',
+            user_id: user.id,
+            client_id: session.client_id,
+            data: {
+                step: "complete",
+                flow,
+                headers: req.headers
             }
-        if(nonce.expires_date < new Date()) {
-            allow = false;
-            let now = Date.now();
-            reason = `expires_date (${nonce.expires_date}) < ${now}`;
-        }
-
-        if(!allow) {
-            nonce.access_log.push(
-                {
-                    date: new Date(),
-                    success: false,
-                    data: info,
-                    reason: reason
-                }
-            );
-            await nonce.save();
-            return false;
-        }
-
-        nonce.is_consumed = true;
-        nonce.consumed_date = new Date();
-        nonce.consumed_data = info;
-        nonce.access_log.push(
-            {
-                date: new Date(),
-                success: true,
-                data: info
-            }
-        );
-        let jwt = await Authentication.createJWT(nonce.data);
-
-        await nonce.save();
-        return jwt;
-    }
-
-    /**
-     * Ensure that the nonce represented by the passed in token is valid and hasn't been deactivated
-     * @param token
-     * @returns {Promise.<boolean>}
-     */
-    static async validateNonce(nonce) {
-        let nonce_record = await Nonce.findOne({nonce: nonce},'is_valid').lean();
-        if(!nonce_record)
-            return false;
-        if(!nonce_record.is_valid) {
-            return false;
-        }
-        //these checks don't apply when verifying a jwt, only when consuming a nonce
-        //but we might do something with them later, so here for reference
-        /*if(nonce_record.single_use)
-            if(nonce_record.is_consumed) {
-                return false;
-            }
-        if(nonce_record.expires_date < new Date()) {
-            return false;
-        }*/
-
-        return true;
-    }
-
-    /**
-     * Authenticate a user via a json web token and return a full user object.
-     * Note: this is a utility function that should not be used in the general case.
-     * JWT authentication is handled via passport JWT strategy in Authorization
-     * @param jwt
-     * @returns {Promise.<*>}
-     */
-    static async authenticate(jwt) {
-        let data = await Authentication.decodeJWT(jwt);
-        if(!data)
-            return false;
-
-        let valid = await Authentication.validateNonce(data.nonce);
-        if(!valid)
-            return false;
-
-        let user = await User.findOne({_id: data.sub});
-        if(!user)
-            return false;
-
-        if(user.account_status !== 'active')
-            return false;
-
-        user.last_login_date = new Date();
-        await user.save();
-
-        return user;
+        });
 
     }
 
-    /**
-     * Create a signed JWT with the given data
-     * @param data
-     * @returns {Promise}
-     */
-    static createJWT(data) {
-        return new Promise(
-            (resolve, reject) => {
-                JWT.sign(
-                    data,
-                    config.client_secret,
-                    {
-                        issuer: process.env.HOSTNAME
-                    },
-                    (err, jwt) => {
-                        if(err)
-                            return reject(err);
-                        resolve(jwt);
-                    }
-                )
-            }
-        );
-    }
-
-    /**
-     * Validate and return the data from a JWT
-     * @param jwt
-     * @returns {Promise}
-     */
-    static decodeJWT(jwt) {
-        return new Promise(
-            (resolve, reject) => {
-                JWT.verify(
-                    jwt,
-                    config.sessionSecret,
-                    {
-                        issuer: process.env.HOSTNAME
-                    },
-                    (err, data) => {
-                        if(err)
-                            return reject(err);
-                        resolve(data);
-                    }
-                )
-            }
-        )
-
-    }
 }
 
 module.exports = Authentication;
