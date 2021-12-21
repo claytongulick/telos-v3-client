@@ -121,7 +121,12 @@ let schema = {
 
     salt: {
         type: DataTypes.STRING
-    }
+    },
+
+    /**
+     * Dictionary of notification channels and last notification timestamp
+     */
+    notification_channels: DataTypes.JSONB
 }
 
 /**

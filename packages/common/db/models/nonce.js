@@ -1,4 +1,7 @@
 const { DataTypes, Model } = require('sequelize');
+const short = require('short-uuid');
+const translator = short(); // Defaults to flickrBase58
+const Activity = require('./activity');
 
 /**
  * @interface NonceSchema
@@ -22,6 +25,14 @@ let schema = {
      */
     token: {
         type: DataTypes.STRING,
+        allowNull: false
+    },
+
+    /**
+     * The user id the nonce is created for
+     */
+    user_id: {
+        type: DataTypes.UUID,
         allowNull: false
     },
 
@@ -53,7 +64,10 @@ let schema = {
      * @instance
      * @type {boolean}
      */
-    is_consumed: DataTypes.BOOLEAN,
+    is_consumed: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    },
 
     /**
      * The date the nonce was used
@@ -94,6 +108,76 @@ let schema = {
  */
 class Nonce extends Model {
 
+    /**
+     * Create a nonce for the given user id that can be used later to issue a JWT
+     * @param user_id
+     * @returns {Promise.<void>}
+     */
+    static async createLoginNonce(user_id, data) {
+        let user = await User.findOne({where: {id: user_id } });
+        if (!user)
+            throw new Error('Invalid user id');
+
+        if (user.account_status !== 'active')
+            throw new Error('User account is ' + user.account_status);
+
+        let token = translator.new(); //generate a shortened valid uuid v4
+
+        let nonce = await Nonce.create({
+            token,
+            user_id,
+            is_consumed: false,
+            is_valid: true,
+            data: {
+                sub: user.username,
+                nonce: token,
+                ...data
+            }
+        });
+
+        return nonce;
+    }
+
+    /**
+     * Consume a nonce and return a JWT
+     * @param nonce
+     * @param headers
+     * @returns {Promise.<boolean>}
+     */
+    static async consumeNonce(token, headers) {
+        let nonce = await Nonce.findOne({where: { token }});
+        return nonce.consume(headers);
+    }
+
+    async consume(headers) {
+        let allow = true;
+        let reason = '';
+
+        if (!this.is_valid) {
+            allow = false;
+            reason = "is_valid set to false";
+        }
+        if (this.single_use)
+            if (this.is_consumed) {
+                allow = false;
+                reason = "is_consumed set to true";
+            }
+        if (this.expires_date < new Date()) {
+            allow = false;
+            let now = Date.now();
+            reason = `expires_date (${nonce.expires_date}) < ${now}`;
+        }
+
+        if(!allow) {
+            return {success: false, reason}
+        }
+
+        this.is_consumed = true;
+        this.consumed_date = new Date();
+        this.consumed_data = headers;
+
+        await this.save();
+    }
 }
 
 let sequelize = require('../sequelize').get(process.env.CLIENT_DB_URI);

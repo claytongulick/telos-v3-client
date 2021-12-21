@@ -31,7 +31,7 @@ const Activity = require('common/db/models/activity');
  */
 class Authentication {
 
-    static async startAuthFlow(req, user, flow) {
+    static async startAuthFlow(req, user, flow, data) {
         /** @property {AuthSession} session */
         let session = req.session;
         session.client_id = process.env.CLIENT_ID;
@@ -52,12 +52,13 @@ class Authentication {
             data: {
                 step: "start",
                 flow,
-                headers: req.headers
+                headers: req.headers,
+                ...data
             }
         })
     }
 
-    static async failAuthFlow(req, user, flow, reason) {
+    static async failAuthFlow(req, user, flow, reason, data) {
         /** @type AuthSession */
         let session = req.session;
 
@@ -77,13 +78,40 @@ class Authentication {
                 step: "fail",
                 flow,
                 reason,
-                headers: req.headers
+                headers: req.headers,
+                ...data
             }
         });
 
     }
 
-    static async completeAuthFlow(req, user, flow) {
+    static async completeAuthFlowStep(req, user, flow, step, data) {
+        /** @type AuthSession */
+        let session = req.session;
+
+        if(flow !== session.flow)
+            throw new Error("Invalid flow");
+
+        if(user.id !== session.user.id)
+            throw new Error("Invalid user");
+
+        session.status = step;
+        session.trusted = false;
+
+        await Activity.create({
+            type: 'auth',
+            user_id: user.id,
+            client_id: session.client_id,
+            data: {
+                step,
+                flow,
+                headers: req.headers,
+                ...data
+            }
+        });
+    }
+
+    static async completeAuthFlow(req, user, flow, data) {
         /** @type AuthSession */
         let session = req.session;
 
@@ -104,7 +132,8 @@ class Authentication {
             data: {
                 step: "complete",
                 flow,
-                headers: req.headers
+                headers: req.headers,
+                ...data
             }
         });
 

@@ -1,0 +1,18 @@
+#set IS_CRON = 1 to indicate that the command is being run under cron
+IS_CRON = 1
+#
+#check for error notifications that need to be sent. this is different from application notifications, these are
+#operational errors that need to be sent to support staff 
+* * * * * telos job run error-log-notification 
+#
+#check for application notifications that need to be sent
+* * * * * telos job run notification
+#
+#check for incoming readings
+* * * * * telos job run readings-fetch
+#
+#run scheduled BPMN processes
+#* * * * * telos process run 
+#
+#purge old notifications nightly
+0 0 * * * telos job run notification-purge
