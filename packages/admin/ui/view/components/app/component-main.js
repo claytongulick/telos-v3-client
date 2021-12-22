@@ -102,7 +102,6 @@ class ComponentMain extends HTMLElement {
         <ion-app>
             <ion-router @ionRouteDidChange=${(e) => this.handleRouteChange(e)}>
                 <ion-route url='/' component='scene-home'></ion-route>
-                <ion-route url='/notifications' component='scene-notifications'></ion-route>
                 <ion-route url='/users' component='scene-users'></ion-route>
                 <ion-route url='/users/:user_id' component='scene-user'>
                     <ion-route url='/profile' component='tab-profile'></ion-route>
@@ -115,13 +114,6 @@ class ComponentMain extends HTMLElement {
                     <ion-route url='/history' component='tab-history'></ion-route>
                     <ion-route component="tab-view"></ion-route>
                 </ion-route>
-                <ion-route url='/communications' component='scene-communications'></ion-route>
-                <ion-route url='/communications/:communication_id' component='scene-communication'>
-                    <ion-route url='/view' component='tab-view'></ion-route>
-                    <ion-route url='/history' component='tab-history'></ion-route>
-                    <ion-route component="tab-view"></ion-route>
-                </ion-route>
-                <ion-route url='/export' component='scene-export'></ion-route>
             </ion-router>
             <ion-split-pane content-id="app_content" when="sm">
                 <ion-menu content-id="app_content">
@@ -139,7 +131,7 @@ class ComponentMain extends HTMLElement {
                                 <ion-item button href="">
                                     <ion-icon slot="start" name='home'></ion-icon>
                                     <ion-label>
-                                        Home
+                                        Dashboard
                                     </ion-label>
                                 </ion-item>
                                 <ion-item button href="users"}>
@@ -148,36 +140,14 @@ class ComponentMain extends HTMLElement {
                                         Users
                                     </ion-label>
                                 </ion-item>
-                                <ion-item button href="notifications">
-                                    <ion-icon slot="start" name='notifications'></ion-icon>
-                                    <ion-label>
-                                       Notifications 
-                                    </ion-label>
-                                    ${this._notifications ? this._notifications.length ?
-                                        html`<ion-badge color="danger">${this._notifications.length}</ion-badge>`
-                                        : '' : ''
-                                    }
-                                </ion-item>
                                 <ion-item button href="invitations"}>
                                     <ion-icon slot="start" name='mail'></ion-icon>
                                     <ion-label>
                                         Invitations
                                     </ion-label>
                                 </ion-item>
-                                <ion-item button href="communications"}>
-                                    <ion-icon slot="start" name='mail'></ion-icon>
-                                    <ion-label>
-                                        Communication
-                                    </ion-label>
-                                </ion-item>
-                                <ion-item button href="export"}>
-                                    <ion-icon slot="start" name='exit'></ion-icon>
-                                    <ion-label>
-                                        Export Data
-                                    </ion-label>
-                                </ion-item>
                                 <ion-item-divider></ion-item-divider>
-                                <ion-item button href="settings"} disabled=disabled>
+                                <ion-item button href="settings"}>
                                     <ion-icon slot="start" name='settings'></ion-icon>
                                     <ion-label>
                                         Settings

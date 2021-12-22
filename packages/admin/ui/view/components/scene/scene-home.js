@@ -38,7 +38,7 @@ class SceneHome extends HTMLElement {
                             </ion-button>
                         </ion-menu-toggle>
                     </ion-buttons>
-                    <ion-title id="title">Home</ion-title>
+                    <ion-title id="title">Dashboard</ion-title>
                 </ion-toolbar>
             </ion-header>
 
