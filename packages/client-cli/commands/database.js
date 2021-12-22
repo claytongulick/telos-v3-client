@@ -40,6 +40,12 @@ class DatabaseCommands {
         sequelize.close();
     }
 
+    static async drop(options) {
+        const sequelize = await require('common/db/sequelize').connect(process.env.CLIENT_DB_URI);
+        await sequelize.drop();
+        sequelize.close();
+    }
+
     static async init(options) {
         const sequelize = await require('common/db/sequelize').connect(process.env.CLIENT_DB_URI);
         let valid_fixtures = ['users','settings'];

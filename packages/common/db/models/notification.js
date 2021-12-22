@@ -39,7 +39,8 @@ let sequelize = require('../sequelize').get(process.env.CLIENT_DB_URI);
 
 let model_options = {
     sequelize, // We need to pass the connection instance
-    modelName: 'notification', // We need to choose the model name
+    modelName: 'Notification', // We need to choose the model name
+    tableName: 'notification', 
     createdAt: 'create_date',
     updatedAt: 'update_date',
     indexes: [

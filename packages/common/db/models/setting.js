@@ -105,7 +105,8 @@ class Setting extends Model {
 let sequelize = require('../sequelize').get(process.env.CLIENT_DB_URI);
 let model_options = {
     sequelize, // We need to pass the connection instance
-    modelName: 'setting', // We need to choose the model name
+    modelName: 'Setting', // We need to choose the model name
+    tableName: 'setting',
     createdAt: 'create_date',
     updatedAt: 'update_date'
 }

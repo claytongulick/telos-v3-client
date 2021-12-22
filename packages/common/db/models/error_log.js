@@ -75,7 +75,8 @@ let sequelize = require('../sequelize').get(process.env.CLIENT_DB_URI);
 
 let model_options = {
     sequelize, // We need to pass the connection instance
-    modelName: 'error_log', // We need to choose the model name
+    modelName: 'ErrorLog', // We need to choose the model name
+    tableName: 'error_log',
     createdAt: 'create_date',
     updatedAt: 'update_date',
     indexes: [

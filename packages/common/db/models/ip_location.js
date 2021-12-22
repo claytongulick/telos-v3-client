@@ -83,7 +83,8 @@ let sequelize = require('../sequelize').get(process.env.CLIENT_DB_URI);
 
 let model_options = {
     sequelize, // We need to pass the connection instance
-    modelName: 'ip_location', // We need to choose the model name
+    modelName: 'IPLocation', // We need to choose the model name
+    tableName: 'ip_location',
     createdAt: 'create_date',
     updatedAt: 'update_date',
     indexes: [
