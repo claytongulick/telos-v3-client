@@ -3,15 +3,14 @@
  *   All rights reserved.
  *   @author Clayton Gulick <clay@ratiosoftware.com>
  */
-import {html, render} from 'lit-html';
-import {repeat} from 'lit-html/directives/repeat';
-import ComponentBase from './component-base-vanilla';
+import {html, render} from 'lit/html.js';
+import {repeat} from 'lit/directives/repeat.js';
 
 /**
  * Utility component for selecting sort items and rearranging the sort order
  * This is intended to be launch via a ion-modal-controller
  */
-class ComponentSortSelection extends ComponentBase {
+class ComponentSortSelection extends HTMLElement {
     static get properties() {
         /**
          * An array of {label: ..., value: ...} items to display in the sort selection

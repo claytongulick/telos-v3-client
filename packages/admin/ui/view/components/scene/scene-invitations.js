@@ -3,9 +3,9 @@
  *   All rights reserved.
  *   @author Clayton Gulick <clay@ratiosoftware.com>
  */
-import {html, render} from 'lit-html';
+import {html, render} from 'lit/html.js';
 import broker from 'databroker';
-import ComponentSortSelection from '../../../../shared/view/components/component-sort-selection';
+import ComponentSortSelection from 'common/ui/components/component-sort-selection';
 
 class SceneInvitations extends HTMLElement {
 

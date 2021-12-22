@@ -15,6 +15,7 @@
 **/
 
 class Core {
+
     static isAlive(req, res) {
         res.json({
             status: 'OK'
@@ -23,7 +24,6 @@ class Core {
 
     static serviceWorker(req, res, next) {
         req.sendFile('./dist/sw.js');
-
     }
 
 }

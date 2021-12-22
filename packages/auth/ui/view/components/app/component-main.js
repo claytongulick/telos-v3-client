@@ -3,7 +3,7 @@
  *   All rights reserved.
  *   @author Clayton Gulick <clay@ratiosoftware.com>
  */
-import {html, render} from 'lit-html';
+import {html, render} from 'lit/html.js';
 import { loadingController, alertController, modalController, toastController, pickerController, actionSheetController } from '@ionic/core';
 
 import broker from 'databroker';

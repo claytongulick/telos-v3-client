@@ -3,8 +3,8 @@
  *   All rights reserved.
  *   @author Clayton Gulick <clay@ratiosoftware.com>
  */
-import {html, render} from 'lit-html';
-import {unsafeHTML} from 'lit-html/directives/unsafe-html';
+import {html, render} from 'lit/html.js';
+import {unsafeHTML} from 'lit/directives/unsafe-html';
 import broker from 'databroker';
 
 class SceneNotifications extends HTMLElement {

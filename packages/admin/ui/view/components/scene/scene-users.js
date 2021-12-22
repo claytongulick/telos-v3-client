@@ -3,11 +3,10 @@
  *   All rights reserved.
  *   @author Clayton Gulick <clay@ratiosoftware.com>
  */
-import {html, render} from 'lit-html';
+import {html, render} from 'lit/html.js';
 import ComponentCardUser from '../app/cards/component-card-user';
-import ComponentSortSelection from '../../../../shared/view/components/component-sort-selection';
-import ComponentFilterSelection from '../../../../shared/view/components/component-filter-selection';
-import ComponentAvatarSelector from '../../../../shared/view/components/component-avatar-selector';
+import ComponentSortSelection from 'common/ui/components/component-sort-selection';
+import ComponentFilterSelection from 'common/ui/components/component-filter-selection';
 import ComponentUserNew from '../app/user/component-user-new';
 import broker from 'databroker';
 

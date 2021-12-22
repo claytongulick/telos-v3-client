@@ -4,7 +4,7 @@
  *   @author Clayton Gulick <clay@ratiosoftware.com>
  */
 import {LitElement, html, css} from 'lit';
-import {classMap} from 'lit-html/directives/class-map';
+import {classMap} from 'lit/directives/class-map.js';
 import croppie_styles from "!css-loader!croppie/croppie.css";
 import Croppie from 'croppie';
 import 'script-loader!exif-js/exif';

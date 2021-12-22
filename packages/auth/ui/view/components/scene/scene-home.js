@@ -3,7 +3,7 @@
  *   All rights reserved.
  *   @author Clayton Gulick <clay@ratiosoftware.com>
  */
-import {html, render} from 'lit-html';
+import {html, render} from 'lit/html.js';
 
 class SceneHome extends HTMLElement {
     connectedCallback() {

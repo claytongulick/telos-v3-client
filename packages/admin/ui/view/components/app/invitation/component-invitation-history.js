@@ -3,10 +3,9 @@
  *   All rights reserved.
  *   @author Clayton Gulick <clay@ratiosoftware.com>
  */
-import {html, render} from 'lit-html';
-import ComponentBase from '../../../../../shared/view/components/component-base-vanilla';
+import {html, render} from 'lit/html.js';
 
-class ComponentInvitationHistory extends ComponentBase {
+class ComponentInvitationHistory extends HTMLElement {
     constructor() {
         super();
     }

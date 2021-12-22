@@ -3,14 +3,13 @@
  *   All rights reserved.
  *   @author Clayton Gulick <clay@ratiosoftware.com>
  */
-import {html, render} from 'lit-html';
-import ComponentBase from '../../../../shared/view/components/component-base-vanilla';
+import {html, render} from 'lit/html.js';
 import broker from 'databroker';
 
 import ComponentUserProfile from '../app/user/component-user-profile';
-import ComponentUserHistory from '../app/user/component-user-history';
+import ComponentUserHistory from '../app/user/component-user-activity';
 
-class SceneUser extends ComponentBase {
+class SceneUser extends HTMLElement {
     constructor() {
         super();
         this.user = {

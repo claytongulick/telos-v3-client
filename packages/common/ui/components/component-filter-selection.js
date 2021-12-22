@@ -3,8 +3,8 @@
  *   All rights reserved.
  *   @author Clayton Gulick <clay@ratiosoftware.com>
  */
-import {html, render} from 'lit-html';
-import {repeat} from 'lit-html/directives/repeat';
+import {html, render} from 'lit/html.js';
+import {repeat} from 'lit/directives/repeat.js';
 
 /**
  * Display a list of filters that can be used generically for any search.

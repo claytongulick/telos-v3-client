@@ -3,17 +3,14 @@
  *   All rights reserved.
  *   @author Clayton Gulick <clay@ratiosoftware.com>
  */
-import {html, render} from 'lit-html';
-import ComponentBase from '../../../../../shared/view/components/component-base-vanilla';
+import {html, render} from 'lit/html.js';
 import ComponentCardUser from '../cards/component-card-user';
-import ComponentAvatarSelector from '../../../../../shared/view/components/component-avatar-selector';
-import constants from '../../../../../shared/isolate/isolate-constants';
+import ComponentAvatarSelector from 'common/ui/components/component-avatar-selector';
+import constants from 'common/ui/classes/constants';
 import broker from 'databroker';
-//import textMask from 'vanilla-text-mask';
-//import textMask from '../../../../../../../text-mask/vanilla/src/vanillaTextMask';
-import createMask from '../../../../../shared/view/ionic-text-mask';
+import createMask from 'common/ui/utility/ionic-text-mask';
 
-class ComponentUserProfile extends ComponentBase {
+class ComponentUserProfile extends HTMLElement {
     constructor() {
         super();
         this._user = {

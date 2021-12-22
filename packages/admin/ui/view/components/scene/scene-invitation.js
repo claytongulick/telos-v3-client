@@ -3,14 +3,13 @@
  *   All rights reserved.
  *   @author Clayton Gulick <clay@ratiosoftware.com>
  */
-import {html, render} from 'lit-html';
-import ComponentBase from '../../../../shared/view/components/component-base-vanilla';
+import {html, render} from 'lit/html.js';
 import broker from 'databroker';
 
 import ComponentInvitationView from '../app/invitation/component-invitation-view';
 import ComponentInvitationHistory from '../app/invitation/component-invitation-history';
 
-class SceneInvitation extends ComponentBase {
+class SceneInvitation extends HTMLElement {
     constructor() {
         super();
         this.invitation = {

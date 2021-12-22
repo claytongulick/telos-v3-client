@@ -3,9 +3,9 @@
  *   All rights reserved.
  *   @author Clayton Gulick <clay@ratiosoftware.com>
  */
-import {html, render} from 'lit-html';
-import createMask from '../../../../../shared/view/ionic-text-mask';
-import Messaging from '../../../../../shared/view/binding/binding-messaging';
+import {html, render} from 'lit/html.js';
+import createMask from 'common/ui/utility/ionic-text-mask';
+import Messaging from 'common/ui/utility/messaging';
 
 class ComponentUserNew extends HTMLElement {
     constructor() {
@@ -15,8 +15,7 @@ class ComponentUserNew extends HTMLElement {
             last_name: '',
             email_address: '',
             phone_cell: '',
-            role_name: 'member',
-            profile: {}
+            roles: [],
         };
     }
 

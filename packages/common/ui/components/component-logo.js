@@ -3,7 +3,7 @@
  *   All rights reserved.
  *   @author Clayton Gulick <clay@ratiosoftware.com>
  */
-import {html, svg, render} from 'lit-html';
+import {html, svg, render} from 'lit/html.js';
 
 class ComponentLogo extends HTMLElement {
 

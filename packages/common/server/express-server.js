@@ -11,19 +11,17 @@
 /**
  * Module dependencies.
  */
-let express = require('express'),
-    morgan = require('morgan'),
-    helmet = require('helmet'),
-    methodOverride = require('method-override'),
-    path = require('path'),
-    redis = require('redis');
-    session = require('express-session');
-    pg_store = require('connect-pg-simple')(session);
-    program = require('commander');
-    rfs = require('rotating-file-stream');
+let express = require('express');
+const morgan = require('morgan');
+const helmet = require('helmet');
+const methodOverride = require('method-override');
+const path = require('path');
+const session = require('express-session');
+const pg_store = require('connect-pg-simple')(session);
+const program = require('commander');
+const rfs = require('rotating-file-stream');
 
-let http_proxy = require('http-proxy');
-let proxy = http_proxy.createProxyServer({});
+const { ErrorLog } = require('../db/models');
 
 /**
  * @typedef {Object} WebLogsConfig Settings for standard web access logging GET, POST, etc...
@@ -33,6 +31,7 @@ let proxy = http_proxy.createProxyServer({});
  * @property {string} interval The log rotation interval
  * 
  * @typedef {Object} ExpressConfig
+ * @property {Object} package_json The package.json for the application
  * @property {string} mount_path The path the app should be mounted on. '/' will be used if not provided.
  * @property {boolean} force_ssl Should non-ssl requests be redirected to ssl port?
  * @property {boolean} enable_compression Whether the server should compress results
@@ -49,8 +48,8 @@ module.exports = function (logger, routes, config, middleware) {
         .option('-a, --auth <username>', 'Force all requests that come in to the express server to be authenticated as the specified user. This can only be used in local and development environments.');
     program.parse();
     let options = program.opts();
-    if(options.auth)
-        logger.warn("Forcing authentication to:" + username);
+    if (options.auth)
+        logger.warn("Forcing authentication to:" + options.auth);
 
     // Initialize express app
     let app = express();
@@ -65,7 +64,7 @@ module.exports = function (logger, routes, config, middleware) {
     app.use(helmet.dnsPrefetchControl());
     app.use(helmet.expectCt());
     app.use(helmet.hidePoweredBy());
-    if(config.force_ssl)
+    if (config.force_ssl)
         app.use(helmet.hsts());
     app.use(helmet.ieNoOpen());
     app.use(helmet.noSniff());
@@ -76,11 +75,11 @@ module.exports = function (logger, routes, config, middleware) {
     //configure statics
     if (typeof config.statics_dir == 'string')
         //e-tags are calculated at request time, the whole file is read. We'll use last-modified for caching
-        app.use(express.static(path.resolve(config.statics_dir), { etag: false }));
+        app.use(config.mount_path, express.static(config.statics_dir, { etag: false }));
     else if (Array.isArray(config.statics_dir) && config.statics_dir.length > 1)
         config.statics_dir.forEach(
             function (dir) {
-                app.use(express.static(path.resolve(dir), { etag: false }));
+                app.use(config.mount_path, express.static(path.resolve(dir), { etag: false }));
             }
         );
 
@@ -105,83 +104,94 @@ module.exports = function (logger, routes, config, middleware) {
     //set up dynamic session based on the hostname that came into this IP. 
     //this is to support *.teloshs.com as well as whitelabeled domains
     app.use((req, res, next) => {
-        //determine the cookie host
-        //the cookie should be set on the root domain
-        /** @type {string} */
-        let request_host = req.headers.host;
-        let cookie_host_domain;
-        //for local development
-        if(request_host == 'localhost') {
-            cookie_host_domain = 'localhost';
-        }
-        else {
-            //for belt and suspenders, only allow domains we know about
-            let root_domain = request_host.split('.').slice(-2).join('.');
-            if(process.env.HOSTNAME == root_domain)
-                cookie_host_domain = root_domain;
-            if(process.env.WHITELABEL_HOSTNAME == root_domain)
-                cookie_host_domain = root_domain;
-        }
-
-        let session_options = {
-            secret: process.env.CLIENT_SECRET,
-            name: 'telos.sid',
-            saveUninitialized: false,
-            resave: false,
-            cookie: {
-                httpOnly: true,
-                secure: true,
-                sameSite: 'strict',
-                domain: cookie_host_domain,
-                maxAge: process.env.SESSION_MAX_AGE || (1000 * 60 * 20) //default to 20 mins if not set
+        try {
+            //determine the cookie host
+            //the cookie should be set on the root domain
+            /** @type {string} */
+            let request_host = req.headers.host;
+            let cookie_host_domain;
+            //for local development
+            if (request_host == 'localhost') {
+                cookie_host_domain = 'localhost';
             }
-        }
+            else {
+                //for belt and suspenders, only allow domains we know about
+                let root_domain = request_host.split('.').slice(-2).join('.');
+                if (process.env.HOSTNAME == root_domain)
+                    cookie_host_domain = root_domain;
+                if (process.env.WHITELABEL_HOSTNAME == root_domain)
+                    cookie_host_domain = root_domain;
+            }
 
-        
-        if(process.env.ENABLE_PG_SESSION) {
-            let pg = require('pg');
-            let pool = new pg.Pool({
-                connectionTimeoutMillis: 2000,
-                connectionString: process.env.SESSION_DB_URI
-            });
-            session_options.store = new pg_store()
-        }
+            let session_options = {
+                secret: process.env.CLIENT_SECRET,
+                name: 'telos.sid',
+                saveUninitialized: false,
+                resave: false,
+                cookie: {
+                    httpOnly: true,
+                    secure: true,
+                    sameSite: 'strict',
+                    domain: cookie_host_domain,
+                    maxAge: process.env.SESSION_MAX_AGE || (1000 * 60 * 20) //default to 20 mins if not set
+                }
+            }
 
-        let dynamic_session = session(session_options);
-        dynamic_session(req, res, next);
+
+            if (process.env.ENABLE_PG_SESSION) {
+                let pg = require('pg');
+                let pool = new pg.Pool({
+                    connectionTimeoutMillis: 2000,
+                    connectionString: process.env.SESSION_DB_URI
+                });
+                session_options.store = new pg_store()
+            }
+
+            let dynamic_session = session(session_options);
+            dynamic_session(req, res, next);
+        }
+        catch (err) {
+            next(err);
+        }
     });
 
     //if the server was launched with an override-authentication parameter, force auth as the specified user
     //this is used for debugging and development purposes only
     app.use(async (req, res, next) => {
-        //only allow this option in local or development environments
-        if(!(['local','development'].includes(process.env.NODE_ENV))) {
-            return next();
+        try {
+
+            //only allow this option in local or development environments
+            if (!(['local', 'development'].includes(process.env.NODE_ENV))) {
+                return next();
+            }
+
+            let username = options.auth;
+            if (!username)
+                return next();
+
+            if (req?.session?.user?.username == username)
+                return next(); //we already have an authenticated session
+
+            let User = require('common/db/models/user');
+            let user = await User.findOne({ where: { username } });
+            if (!user)
+                return next('Invalid or unknown auth username: ' + username);
+            /** @type {AuthSession} */
+            let auth_session = {
+                client_id: 'local',
+                flow: 'password',
+                session_start_date: new Date(),
+                session_trusted_date: new Date(),
+                status: 'complete',
+                trusted: true,
+                user: user
+            };
+            Object.assign(req.session, auth_session);
+            next();
         }
-
-        let username = options.auth;
-        if(!username)
-            return next();
-
-        if(req?.session?.user?.username == username)
-            return next(); //we already have an authenticated session
-
-        let User = require('common/db/models/user');
-        let user = await User.findOne({where: {username}});
-        if(!user)
-            return next('Invalid or unknown auth username: ' + username);
-        /** @type {AuthSession} */
-        let auth_session = {
-            client_id: 'local',
-            flow: 'password',
-            session_start_date: new Date(),
-            session_trusted_date: new Date(),
-            status: 'complete',
-            trusted: true,
-            user: user
-        };
-        Object.assign(req.session, auth_session);
-        next();
+        catch (err) {
+            next(err);
+        }
     });
 
     //allow the use of modern http verbs for older clients that might not support them (PUT, etc...)
@@ -189,21 +199,33 @@ module.exports = function (logger, routes, config, middleware) {
 
     let router = express.Router();
     //let each route file set up its routes the way it wants
-    for(let route of routes) {
+    for (let route of routes) {
         route(router)
     }
     //hoist the configured routes onto the mount path
     app.use(config.mount_path || '/', router);
 
     //register any additional middleware the server wants
-    if(middleware && Array.isArray(middleware)) {
-        for(let m of middleware)
+    if (middleware && Array.isArray(middleware)) {
+        for (let m of middleware)
             app.use(m)
     }
 
     //logging error handler
-    app.use((err, req, res, next) => {
+    app.use(async (err, req, res, next) => {
         logger.error(err.stack);
+        try {
+            await ErrorLog.create({
+                error_type: typeof err,
+                code: err.code,
+                message: err.message,
+                stack_trace: err.stack,
+                application: config?.package_json?.name
+            });
+        }
+        catch (err) {
+            logger.err("Failed to save error log: " + err.stack);
+        }
         next(err);
     });
 

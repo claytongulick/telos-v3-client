@@ -3,23 +3,17 @@
  *   All rights reserved.
  *   @author Clayton Gulick <clay@ratiosoftware.com>
  */
-import {html, render} from 'lit-html';
+import {html, render} from 'lit/html.js';
 import { loadingController, alertController, modalController, toastController, pickerController, actionSheetController } from '@ionic/core';
 
 import broker from 'databroker';
 
 import SceneHome from '../scene/scene-home';
-import SceneNotifications from '../scene/scene-notifications';
 import SceneUser from '../scene/scene-user';
 import SceneUsers from '../scene/scene-users';
 import SceneInvitations from '../scene/scene-invitations';
 import SceneInvitation from '../scene/scene-invitation';
-import SceneCommunications from '../scene/scene-communications';
-import SceneCommunication from '../scene/scene-communication';
-import SceneExport from '../scene/scene-export';
-import ComponentLogin from './login/component-login';
-import ComponentLogout from './login/component-logout';
-import ComponentLogo from '../../../../shared/view/components/component-logo';
+import ComponentLogo from 'common/ui/components/component-logo';
 import ApplicationState from 'applicationstate';
 
 

@@ -124,9 +124,20 @@ let schema = {
     },
 
     /**
-     * Dictionary of notification channels and last notification timestamp
+     * Dictionary of notification channels and last notification read timestamp
+     * This is used to keep track of the last notification a user read from a channel
+     * looks like: {
+     *  "channel-name": Date,
+     *  "another-channel": Date,
+     *  ...
+     * }
      */
-    notification_channels: DataTypes.JSONB
+    notification_channels: DataTypes.JSONB,
+
+    /**
+     * A dictionary of user preferences, such as notification mechanisms (sms, email, app)
+     */
+    preferences: DataTypes.JSONB
 }
 
 /**

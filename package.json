@@ -3,13 +3,13 @@
   "private": true,
   "workspaces": [
     "packages/admin",
-    "packages/api",
     "packages/auth",
+    "packages/client-cli",
     "packages/common",
+    "packages/jobs",
     "packages/patient",
     "packages/provider",
-    "packages/proxy",
-    "packages/jobs"
+    "packages/proxy"
   ],
   "dependencies": {
   }

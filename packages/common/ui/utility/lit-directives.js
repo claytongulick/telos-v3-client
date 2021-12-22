@@ -3,7 +3,7 @@
  *   All rights reserved.
  *   @author Clayton Gulick <clay@ratiosoftware.com>
  */
-import {directive} from 'lit-html';
+import {directive} from 'lit/html.js';
 
 const phone = (value) => directive((part) => {
     if(!value)

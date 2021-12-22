@@ -4,6 +4,7 @@
  *   @author Clayton Gulick <clay@ratiosoftware.com>
  */
 const package_json = require('../package.json');
+const path = require('path');
 
 /**
  * 
@@ -82,7 +83,8 @@ let config = {
     },
     /** @type {import('../../common/server/express-server').ExpressConfig} */
     express: {
-        statics_dir: '/dist',
+        package_json,
+        statics_dir: path.resolve(__dirname,'..','dist'),
         mount_path: '/admin',
         force_ssl: false,
         enable_compression: true,

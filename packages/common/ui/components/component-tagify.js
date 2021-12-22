@@ -3,7 +3,7 @@
  *   All rights reserved.
  *   @author Clayton Gulick <clay@ratiosoftware.com>
  */
-import {render, html} from 'lit-html';
+import {render, html} from 'lit/html.js';
 import '@yaireo/tagify/dist/tagify.css';
 import Tagify from '@yaireo/tagify';
 

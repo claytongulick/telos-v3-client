@@ -1,10 +1,13 @@
 const { DataTypes, Model } = require('sequelize');
 /**
- * @interface ErrorLogSchema
+ * @typedef ErrorLogSchema
  */
 let schema = {
     /**
      * The unique id for the error
+     * @memberof ErrorLogSchema
+     * @instance
+     * @type {number}
      */
     id: {
         type: DataTypes.INTEGER,
@@ -16,6 +19,11 @@ let schema = {
      * The type of error that took place
      */
     error_type: DataTypes.STRING,
+
+    /**
+     * The error code, if any
+     */
+    code: DataTypes.STRING,
 
     /**
      * Message associated with the error, if any
