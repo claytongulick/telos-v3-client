@@ -8,12 +8,13 @@ import ComponentCardUser from '../app/cards/component-card-user';
 import ComponentSortSelection from 'common/ui/components/component-sort-selection';
 import ComponentFilterSelection from 'common/ui/components/component-filter-selection';
 import ComponentUserNew from '../app/user/component-user-new';
-import broker from 'databroker';
+import {Broker} from 'databroker';
 
 class SceneUsers extends HTMLElement {
 
     constructor() {
         super();
+        this.broker = new Broker();
         this.users = [];
         this.sort_items = [
                     {label: 'Create Date', value: 'created_date', state: 0},
@@ -226,7 +227,7 @@ class SceneUsers extends HTMLElement {
             query.filter.$text = { $search: this.search };
         }
 
-        let result = await broker.get('/api/users', query);
+        let result = await this.broker.get('/api/users', query);
         this.users = result;
         this.render();
 
@@ -249,7 +250,7 @@ class SceneUsers extends HTMLElement {
 
         let created_user;
         try {
-            created_user = await broker.post('/api/users', new_user, {json: true});
+            created_user = await this.broker.post('/api/users', new_user, {json: true});
         }
         catch(err) {
             alert(`Error adding user: ${err}`);

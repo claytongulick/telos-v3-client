@@ -4,7 +4,6 @@
  *   @author Clayton Gulick <clay@ratiosoftware.com>
  */
 import {html, render} from 'lit/html.js';
-import broker from 'databroker';
 
 
 class ComponentInvitationView extends HTMLElement {

@@ -4,7 +4,7 @@
  *   @author Clayton Gulick <clay@ratiosoftware.com>
  */
 import {html, render} from 'lit/html.js';
-import broker from 'databroker';
+import {Broker} from 'databroker';
 
 import ComponentInvitationView from '../app/invitation/component-invitation-view';
 import ComponentInvitationHistory from '../app/invitation/component-invitation-history';
@@ -12,6 +12,7 @@ import ComponentInvitationHistory from '../app/invitation/component-invitation-h
 class SceneInvitation extends HTMLElement {
     constructor() {
         super();
+        this.broker = new Broker();
         this.invitation = {
             invitation_template: '',
             invitation_type: '',
@@ -99,7 +100,7 @@ class SceneInvitation extends HTMLElement {
     }
 
     async loadInvitation() {
-        this.invitation = await broker.get(`/api/invitations/id/${this.invitation_id}`);
+        this.invitation = await this.broker.get(`/api/invitations/id/${this.invitation_id}`);
         this.render();
         this.updateComponents(); //we do this manually because we're managing the lifecycle of these components manually
     }

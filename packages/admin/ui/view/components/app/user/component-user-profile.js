@@ -7,12 +7,13 @@ import {html, render} from 'lit/html.js';
 import ComponentCardUser from '../cards/component-card-user';
 import ComponentAvatarSelector from 'common/ui/components/component-avatar-selector';
 import constants from 'common/ui/classes/constants';
-import broker from 'databroker';
+import {Broker} from 'databroker';
 import createMask from 'common/ui/utility/ionic-text-mask';
 
 class ComponentUserProfile extends HTMLElement {
     constructor() {
         super();
+        this.broker = new Broker();
         this._user = {
             user_name: null,
             address: {
@@ -157,7 +158,7 @@ class ComponentUserProfile extends HTMLElement {
                 this.error_elements = [];
             }
             let value = target.value;
-            let user = await broker.patch(`/api/users/${this.user._id}`, [
+            let user = await this.broker.patch(`/api/users/${this.user._id}`, [
                 {op:'replace', path: path, value: value}
             ]);
             this.user = user;
@@ -209,7 +210,7 @@ class ComponentUserProfile extends HTMLElement {
         this.user.profile_image = result;
         this.handleAvatarSelectionCancel();
         try {
-            let user = await broker.patch(`/api/users/${this.user._id}`, [
+            let user = await this.broker.patch(`/api/users/${this.user._id}`, [
                 {op:'replace', path: '/avatar', value: this.user.profile_image}
             ]);
             this.user = user;
@@ -267,7 +268,7 @@ class ComponentUserProfile extends HTMLElement {
 
     async sendCommunication(communication) {
         let toast_controller = window.toastController;
-        let new_communication = await broker.post('/api/communication/nonce', communication, {json: true});
+        let new_communication = await this.broker.post('/api/communication/nonce', communication, {json: true});
 
         let message = await toast_controller.create({
             message: "Communication job scheduled",

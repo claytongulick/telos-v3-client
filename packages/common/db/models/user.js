@@ -166,7 +166,12 @@ let model_options = {
     modelName: 'User', // We need to choose the model name
     tableName: 'application_user',
     createdAt: 'create_date',
-    updatedAt: 'update_date'
+    updatedAt: 'update_date',
+    defaultScope: {
+        attributes: {
+            include: ['id','username','email_address','first_name','last_name','phone','roles','resource','account_status']
+        }
+    }
 }
 
 User.init(schema, model_options);

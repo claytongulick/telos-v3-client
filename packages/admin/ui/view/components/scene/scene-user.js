@@ -4,7 +4,7 @@
  *   @author Clayton Gulick <clay@ratiosoftware.com>
  */
 import {html, render} from 'lit/html.js';
-import broker from 'databroker';
+import {Broker} from 'databroker';
 
 import ComponentUserProfile from '../app/user/component-user-profile';
 import ComponentUserHistory from '../app/user/component-user-activity';
@@ -12,6 +12,7 @@ import ComponentUserHistory from '../app/user/component-user-activity';
 class SceneUser extends HTMLElement {
     constructor() {
         super();
+        this.broker = new Broker();
         this.user = {
             username: '',
             email: '',
@@ -109,7 +110,7 @@ class SceneUser extends HTMLElement {
     }
 
     async handleGetLoginLink() {
-        let response = await broker.get('/api/login/link/' + this.user._id);
+        let response = await this.broker.get('/api/login/link/' + this.user._id);
         const alertController = window.alertController;
         
         const alert = await alertController.create({
@@ -202,7 +203,7 @@ class SceneUser extends HTMLElement {
             await message.present();
             return;
         }
-        this.user = await broker.patch(`/api/users/${this.user_id}`,
+        this.user = await this.broker.patch(`/api/users/${this.user_id}`,
         [
             {op: 'replace', path: '/password', value: new_password}
         ]);
@@ -222,7 +223,7 @@ class SceneUser extends HTMLElement {
     }
 
     async loadUser() {
-        this.user = await broker.get(`/api/users/${this.user_id}`);
+        this.user = await this.broker.get(`/api/users/${this.user_id}`);
         this.render();
         this.updateComponents(); //we do this manually because we're managing the lifecycle of these components manually
     }

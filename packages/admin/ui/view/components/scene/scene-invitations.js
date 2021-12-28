@@ -4,13 +4,14 @@
  *   @author Clayton Gulick <clay@ratiosoftware.com>
  */
 import {html, render} from 'lit/html.js';
-import broker from 'databroker';
+import {Broker} from 'databroker';
 import ComponentSortSelection from 'common/ui/components/component-sort-selection';
 
 class SceneInvitations extends HTMLElement {
 
     constructor() {
         super();
+        this.broker = new Broker();
         this.invitations = [];
         this.sort_items = [
                     {label: 'Create Date', value: 'created_date', state: 0},
@@ -261,7 +262,7 @@ class SceneInvitations extends HTMLElement {
             query.filter.$text = { $search: this.search };
         }
 
-        let result = await broker.get('/api/invitations', query);
+        let result = await this.broker.get('/api/invitations', query);
         this.invitations = result;
         this.render();
 

@@ -6,7 +6,7 @@
 import {html, render} from 'lit/html.js';
 import { loadingController, alertController, modalController, toastController, pickerController, actionSheetController } from '@ionic/core';
 
-import broker from 'databroker';
+import {Broker} from 'databroker';
 
 import SceneHome from '../scene/scene-home';
 import SceneUser from '../scene/scene-user';
@@ -28,6 +28,7 @@ class ComponentMain extends HTMLElement {
         this.version = VERSION;
         this.environment = NODE_ENV;
         this.app_name = APP_NAME;
+        this.broker = new Broker();
 
         console.log(`Starting ${this.app_name} v${this.version} in ${this.environment} envioronment.`)
 
@@ -73,7 +74,7 @@ class ComponentMain extends HTMLElement {
         window.addEventListener('error',async (e) => {await handleError(e.message) });
         window.onunhandledrejection = async (e) => {await handleError(e.reason) };
 
-        broker.addEventListener('missing_credentials', () => this.handleMissingCredentials());
+        this.broker.addEventListener('missing_credentials', () => this.handleMissingCredentials());
 
     }
 
@@ -197,8 +198,8 @@ class ComponentMain extends HTMLElement {
         this.addEventListener('logout', this.handleLogout.bind(this));
         //this.addEventListener('missing_credentials', this.handleMissingCredentials.bind(this));
         this.addEventListener('navigate', this.handleNavigate.bind(this));
-        broker.addEventListener('loading', this.handleLoading.bind(this));
-        broker.addEventListener('loading_complete', this.handleLoadingComplete.bind(this));
+        this.broker.addEventListener('loading', this.handleLoading.bind(this));
+        this.broker.addEventListener('loading_complete', this.handleLoadingComplete.bind(this));
         this.querySelector('ion-nav').addEventListener("ionNavWillChange", (e) => this.handleNavigate(e));
         this.loading_controller = window.loadingController;
         this.progress_bar = this.querySelector('ion-progress-bar');
@@ -213,7 +214,7 @@ class ComponentMain extends HTMLElement {
             console.warn("Unable to poll for notifications, no valid user");
             return;
         }
-        this._notifications = await broker.get(`/api/notifications/admin/${user._id}`);
+        this._notifications = await this.broker.get(`/api/notifications/admin/${user._id}`);
         this.render();
     }
 

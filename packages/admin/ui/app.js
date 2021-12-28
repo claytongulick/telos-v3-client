@@ -20,12 +20,17 @@ import {defineCustomElements} from '@ionic/core/dist/esm/loader';
 import '@ionic/core/css/ionic.bundle.css';
 import './css/theme.css';
 
+//configure the databroker to prefix with /admin
+import {Broker} from "databroker";
+Broker.config.base_url='/admin';
+
 //the main application component
 import Main from './view/components/app/component-main';
 
 //load the state from indexedDB
 import ApplicationState from "applicationstate";
 import { init } from "applicationstate/plugins/indexeddb";
+
 
 //load application state before we do anything else
 console.log('Starting up: ' + CLIENT_ID + ' admin');

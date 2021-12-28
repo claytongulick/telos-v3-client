@@ -6,7 +6,7 @@
 import {html, render} from 'lit/html.js';
 import { loadingController, alertController, modalController, toastController, pickerController, actionSheetController } from '@ionic/core';
 
-import broker from 'databroker';
+import {Broker} from 'databroker';
 
 import SceneHome from '../scene/scene-home';
 import ApplicationState from 'applicationstate';
@@ -19,6 +19,7 @@ class ComponentMain extends HTMLElement {
 
     constructor() {
         super();
+        this.broker = new Broker();
 
         this.version = VERSION;
         this.environment = NODE_ENV;
@@ -76,8 +77,8 @@ class ComponentMain extends HTMLElement {
     }
 
     async init() {
-        broker.addEventListener('loading', this.handleLoading.bind(this));
-        broker.addEventListener('loading_complete', this.handleLoadingComplete.bind(this));
+        this.broker.addEventListener('loading', this.handleLoading.bind(this));
+        this.broker.addEventListener('loading_complete', this.handleLoadingComplete.bind(this));
         this.loading_controller = window.loadingController;
         this.progress_bar = this.querySelector('ion-progress-bar');
     }

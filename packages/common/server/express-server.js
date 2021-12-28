@@ -224,7 +224,7 @@ module.exports = function (logger, routes, config, middleware) {
             });
         }
         catch (err) {
-            logger.err("Failed to save error log: " + err.stack);
+            logger.error("Failed to save error log: " + err.stack);
         }
         next(err);
     });

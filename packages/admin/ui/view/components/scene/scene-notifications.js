@@ -5,12 +5,13 @@
  */
 import {html, render} from 'lit/html.js';
 import {unsafeHTML} from 'lit/directives/unsafe-html';
-import broker from 'databroker';
+import {Broker} from 'databroker';
 
 class SceneNotifications extends HTMLElement {
 
     constructor() {
         super();
+        this.broker = new Broker();
         this.notifications = [];
     }
 
@@ -102,7 +103,7 @@ class SceneNotifications extends HTMLElement {
             return;
 
         //create the family object
-        await broker.post(`/api/notifications/admin`, {message: notification} );
+        await this.broker.post(`/api/notifications/admin`, {message: notification} );
         await this.getNotifications();
         this.render();
     }
@@ -140,7 +141,7 @@ class SceneNotifications extends HTMLElement {
     async getNotifications() {
         let date = new Date();
 
-        let result = await broker.get('/api/notifications/admin');
+        let result = await this.broker.get('/api/notifications/admin');
         this.notifications = result;
         this.render();
 
