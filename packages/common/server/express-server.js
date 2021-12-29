@@ -43,7 +43,7 @@ const { ErrorLog } = require('../db/models');
  * @param {ExpressConfig} config 
  * @returns 
  */
-module.exports = function (logger, routes, config, middleware) {
+module.exports = function (logger, routers, config, middleware) {
     program
         .option('-a, --auth <username>', 'Force all requests that come in to the express server to be authenticated as the specified user. This can only be used in local and development environments.');
     program.parse();
@@ -58,9 +58,11 @@ module.exports = function (logger, routes, config, middleware) {
 
     // Use helmet to secure Express headers
     app.use(helmet.frameguard('sameorigin'));
+    /*
     app.use(helmet.contentSecurityPolicy({
         useDefaults: true
     }));
+    */
     app.use(helmet.dnsPrefetchControl());
     app.use(helmet.expectCt());
     app.use(helmet.hidePoweredBy());
@@ -197,13 +199,11 @@ module.exports = function (logger, routes, config, middleware) {
     //allow the use of modern http verbs for older clients that might not support them (PUT, etc...)
     app.use(methodOverride());
 
-    let router = express.Router();
     //let each route file set up its routes the way it wants
-    for (let route of routes) {
-        route(router)
+    for (let router of routers) {
+        //hoist the configured routes onto the mount path
+        app.use(router.__telos_mount_path || config.mount_path || '/', router);
     }
-    //hoist the configured routes onto the mount path
-    app.use(config.mount_path || '/', router);
 
     //register any additional middleware the server wants
     if (middleware && Array.isArray(middleware)) {

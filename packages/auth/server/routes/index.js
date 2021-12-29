@@ -14,4 +14,10 @@ glob.sync(`${__dirname}/**/*.js`).forEach(
     }
 );
 
-module.exports = routes;
+let router = express.Router();
+router.__telos_mount_path = '/auth'
+for(let route of routes) {
+    route(router);
+}
+
+module.exports = router;

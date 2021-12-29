@@ -84,5 +84,23 @@ let model_options = {
     ]
 }
 
+let admin_options = {
+    actions: {
+        edit: {
+            isVisible: false
+        },
+        delete: {
+            isVisible: false
+        },
+        bulkDelete: {
+            isVisible: false
+        },
+        new: {
+            isVisible: false
+        }
+    }
+}
+
 ErrorLog.init(schema, model_options);
+ErrorLog.admin_options = admin_options;
 module.exports = ErrorLog;

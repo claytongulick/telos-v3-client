@@ -204,8 +204,10 @@ class ComponentMain extends HTMLElement {
         this.loading_controller = window.loadingController;
         this.progress_bar = this.querySelector('ion-progress-bar');
 
+        /*
         if(!this._notification_poll_interval_key)
             this._notification_poll_interval_key = setInterval(() => this.pollNotifications(), 5000);
+        */
     }
 
     async pollNotifications() {
@@ -214,7 +216,7 @@ class ComponentMain extends HTMLElement {
             console.warn("Unable to poll for notifications, no valid user");
             return;
         }
-        this._notifications = await this.broker.get(`/api/notifications/admin/${user._id}`);
+        this._notifications = await this.broker.get(`/api/notifications/admin/${user.id}`);
         this.render();
     }
 

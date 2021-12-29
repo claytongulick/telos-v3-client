@@ -240,7 +240,7 @@ class SceneInvitations extends HTMLElement {
 
     selectInvitation(invitation) {
         let router = document.querySelector('ion-router');
-        router.push('/invitations/' + invitation._id);
+        router.push('/invitations/' + invitation.id);
     }
 
     async handleSearchbarChange(e) {

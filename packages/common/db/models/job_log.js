@@ -83,5 +83,23 @@ let model_options = {
     ]
 }
 
+let admin_options = {
+    actions: {
+        edit: {
+            isVisible: false
+        },
+        delete: {
+            isVisible: false
+        },
+        bulkDelete: {
+            isVisible: false
+        },
+        new: {
+            isVisible: false
+        }
+    }
+}
+
 JobLog.init(schema, model_options);
+JobLog.admin_options = admin_options;
 module.exports = JobLog;

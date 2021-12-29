@@ -92,7 +92,7 @@ class ComponentCardUser extends HTMLElement {
 
     handleViewUser() {
         let router = document.querySelector('ion-router');
-        router.push(`/users/${this.user._id}`)
+        router.push(`/users/${this.user.id}`)
     }
 
 }

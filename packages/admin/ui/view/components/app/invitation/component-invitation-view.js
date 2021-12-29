@@ -76,7 +76,7 @@ class ComponentInvitationView extends HTMLElement {
                     <ion-item>
                         <ion-label>Created by:</ion-label> ${invitation.created_by ?
                             html`
-                            <a href="#/users/${invitation.created_by._id}">
+                            <a href="#/users/${invitation.created_by.id}">
                             ${invitation.created_by.first_name} ${invitation.created_by.last_name}
                             </a>
                             `:''

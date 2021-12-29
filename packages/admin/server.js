@@ -14,10 +14,9 @@ dotenv.config({
 });
 let config = require('./config/config');
 let logger = require('common/server/logging').getLogger(config.logging);
-require('./server/classes/passport-utility').configurePassport();
-let routes = require('./server/routes');
+let server_router = require('./server/routes');
 let ExpressServer = require('common/server/express-server')
-let app = ExpressServer(logger, routes, config.express);
+let app = ExpressServer(logger, [server_router], config.express);
 let ClusterServer = require('common/server/cluster-server');
 
 let server = new ClusterServer(app, logger, config.cluster);

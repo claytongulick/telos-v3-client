@@ -14,7 +14,7 @@ dotenv.config({
 });
 let config = require('./config/config');
 let logger = require('common/server/logging').getLogger(config.logging);
-let routes = require('./server/routes');
+let router = require('./server/routes');
 //we don't use the common express server for the proxy server
 let ExpressServer = require('common/server/express-server');
 let http_proxy = require('http-proxy');
@@ -37,7 +37,7 @@ let proxy_middleware = async (req, res, next) => {
     }
 } 
 
-let app = ExpressServer(logger, routes, config.express, [proxy_middleware]);
+let app = ExpressServer(logger, [router], config.express, [proxy_middleware]);
 let ClusterServer = require('common/server/cluster-server');
 
 let server = new ClusterServer(app, logger, config.cluster);

@@ -1,6 +1,6 @@
 class OTP {
     static async setOTP(user_id) {
-        let user = await User.findOne({where: {id: user_id}, attributes:['_id', 'otp']});
+        let user = await User.findOne({where: {id: user_id}, attributes:['id', 'otp']});
         if(!user)
             throw new Error("Invalid user_id");
 
@@ -18,7 +18,7 @@ class OTP {
     }
 
     static async authenticateOTP(user_id, code, info) {
-        let user = await User.findOne({where: {id: user_id}, attributes:['_id', 'otp']});
+        let user = await User.findOne({where: {id: user_id}, attributes:['id', 'otp']});
         if(!user)
             throw new Error("Invalid user_id");
 

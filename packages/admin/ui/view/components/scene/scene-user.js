@@ -110,7 +110,7 @@ class SceneUser extends HTMLElement {
     }
 
     async handleGetLoginLink() {
-        let response = await this.broker.get('/api/login/link/' + this.user._id);
+        let response = await this.broker.get('/api/login/link/' + this.user.id);
         const alertController = window.alertController;
         
         const alert = await alertController.create({

@@ -166,7 +166,7 @@ class SceneCommunications extends HTMLElement {
 
     selectCommunication(communication) {
         let router = document.querySelector('ion-router');
-        router.push('/communications/' + communication._id);
+        router.push('/communications/' + communication.id);
     }
 
     async handleSearchbarChange(e) {

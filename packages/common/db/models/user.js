@@ -169,10 +169,15 @@ let model_options = {
     updatedAt: 'update_date',
     defaultScope: {
         attributes: {
-            include: ['id','username','email_address','first_name','last_name','phone','roles','resource','account_status']
+            include: ['id','username','email_address','first_name','last_name','phone','roles','resource','account_status','preferences']
         }
     }
 }
 
+let admin_options = {
+
+}
+
 User.init(schema, model_options);
+User.admin_options = admin_options;
 module.exports = User;

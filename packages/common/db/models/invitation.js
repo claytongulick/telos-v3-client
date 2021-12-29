@@ -143,5 +143,10 @@ let model_options = {
     ]
 }
 
+let admin_options = {
+
+}
+
 Invitation.init(schema, model_options);
+Invitation.admin_options = admin_options;
 module.exports = Invitation;

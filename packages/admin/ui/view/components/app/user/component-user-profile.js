@@ -158,7 +158,7 @@ class ComponentUserProfile extends HTMLElement {
                 this.error_elements = [];
             }
             let value = target.value;
-            let user = await this.broker.patch(`/api/users/${this.user._id}`, [
+            let user = await this.broker.patch(`/api/users/${this.user.id}`, [
                 {op:'replace', path: path, value: value}
             ]);
             this.user = user;
@@ -210,7 +210,7 @@ class ComponentUserProfile extends HTMLElement {
         this.user.profile_image = result;
         this.handleAvatarSelectionCancel();
         try {
-            let user = await this.broker.patch(`/api/users/${this.user._id}`, [
+            let user = await this.broker.patch(`/api/users/${this.user.id}`, [
                 {op:'replace', path: '/avatar', value: this.user.profile_image}
             ]);
             this.user = user;
@@ -225,7 +225,7 @@ class ComponentUserProfile extends HTMLElement {
         let communication = {
                 to: [
                     {
-                        reference: this.user._id,
+                        reference: this.user.id,
                         reference_type: 'User',
                         to_address: ''
                     }

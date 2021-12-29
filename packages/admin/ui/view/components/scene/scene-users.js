@@ -258,7 +258,7 @@ class SceneUsers extends HTMLElement {
 
         //redirect to the created user
         let router = document.querySelector('ion-router');
-        router.push(`/users/${created_user._id}`);
+        router.push(`/users/${created_user.id}`);
 
     }
 

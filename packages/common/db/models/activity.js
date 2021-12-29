@@ -87,5 +87,22 @@ let model_options = {
     ]
 }
 
+let admin_options = {
+    actions: {
+        edit: {
+            isVisible: false
+        },
+        delete: {
+            isVisible: false
+        },
+        bulkDelete: {
+            isVisible: false
+        },
+        new: {
+            isVisible: false
+        }
+    }
+};
 Activity.init(schema, model_options);
+Activity.admin_options = admin_options;
 module.exports = Activity;

@@ -14,4 +14,10 @@ glob.sync(`${__dirname}/**/*.js`).forEach(
     }
 );
 
+let router = express.Router();
+router.__telos_mount_path = '/proxy'
+for(let route of routes) {
+    route(router);
+}
+
 module.exports = routes;
