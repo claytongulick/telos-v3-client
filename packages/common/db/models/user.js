@@ -1,4 +1,5 @@
 const { DataTypes, Model } = require('sequelize');
+const { PatchableModel } = require('../../server/json-patch-sequelize');
 
 let schema = {
     /**
@@ -143,7 +144,7 @@ let schema = {
 /**
  * @type {typeof import('sequelize').Model}
  */
-class User extends Model {
+class User extends PatchableModel {
     async setPassword(password) {
         let Encryption = require('../../server/encryption');
         let {hash, salt} = await Encryption.hash(password);

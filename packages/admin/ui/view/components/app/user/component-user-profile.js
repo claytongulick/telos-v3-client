@@ -103,7 +103,7 @@ class ComponentUserProfile extends HTMLElement {
                         </ion-item>
                         <ion-item>
                             <ion-label position="floating">Mobile Phone</ion-label>
-                            <ion-input id="phone_cell" type="tel" .value=${user.phone_cell} @change=${(e) => this.patch('/phone_cell',e.currentTarget)}></ion-input>
+                            <ion-input id="phone" type="tel" .value=${user.phone} @change=${(e) => this.patch('/phone',e.currentTarget)}></ion-input>
                         </ion-item>
                         <ion-item>
                             <ion-label position="floating">Account</ion-label>
@@ -135,7 +135,7 @@ class ComponentUserProfile extends HTMLElement {
 
 
     async init() {
-        let input_phone_cell = this.querySelector('#phone_cell');
+        let input_phone_cell = this.querySelector('#phone');
         let mask = ['(', /[1-9]/, /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]
         this.mask_controller = createMask({
             inputElement: input_phone_cell,
@@ -247,7 +247,7 @@ class ComponentUserProfile extends HTMLElement {
                     handler: async () => {
                         communication.communication_template = '/communication/login-sms',
                         communication.communication_type = 'sms'
-                        communication.to[0].to_address = this.user.phone_cell;
+                        communication.to[0].to_address = this.user.phone;
                         this.sendCommunication(communication);
                     }
                 },

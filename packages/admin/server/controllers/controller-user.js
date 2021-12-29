@@ -33,21 +33,11 @@ class UserController {
         if(req.body.password)
             await new_user.setPassword(req.body.password);
 
-        res.json(new_user.clean());
+        res.json(new_user);
     }
 
     static async patchUser(req, res, next) {
         let user = req.user;
-        let rules_mode = 'whitelist';
-        let rules = [
-            {path: '/first_name'},
-            {path: '/last_name'},
-            {path: '/email_address'},
-            {path: '/avatar'},
-            {path: '/phone'},
-            {path: '/password', op: 'replace'}
-        ];
-
         let patch = req.body;
         let user_id = req.params.user_id;
         let patch_user = await User.findOne({where: {id: user_id}});
@@ -55,10 +45,8 @@ class UserController {
         if(!patch_user)
             return res.status(404).json({status: 'error', message: 'user not found'});
 
-        if(user.role_name == 'admin') {
-            rules = [{path: '/id'}, {path: '/id'}];
-            rules_mode = 'blacklist';
-        }
+        let rules = [{path: '/id'}, {path: '/id'}];
+        let rules_mode = 'blacklist';
 
         try {
             await patch_user.jsonPatch(patch,
@@ -75,12 +63,13 @@ class UserController {
                     ],
                     autosave: true
                 });
+            await patch_user.save();
         }
         catch(err) {
             return res.status(418).json(err);
         }
 
-        res.json(patch_user.clean());
+        res.json(patch_user);
     }
 }
 

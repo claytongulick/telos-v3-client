@@ -13,6 +13,8 @@
  */
 let express = require('express');
 const morgan = require('morgan');
+const bodyParser = require('body-parser');
+const compression = require('compression');
 const helmet = require('helmet');
 const methodOverride = require('method-override');
 const path = require('path');
@@ -73,6 +75,16 @@ module.exports = function (logger, routers, config, middleware) {
     app.use(helmet.permittedCrossDomainPolicies());
     app.use(helmet.referrerPolicy());
     app.use(helmet.xssFilter());
+
+    // Request body parsing middleware should be above methodOverride
+    app.use(bodyParser.json({ limit: '10mb' }));
+    app.use(bodyParser.urlencoded({
+        extended: true,
+        limit: '10mb'
+    }));
+
+    // Should be placed before express.static
+    app.use(compression());
 
     //configure statics
     if (typeof config.statics_dir == 'string')
