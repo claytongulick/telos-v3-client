@@ -28,7 +28,7 @@ let webpack_config = {
         path: public_path,
         chunkFilename: 'chunks/[id].js',
         filename: '[name].js',
-        publicPath: "/"
+        publicPath: "/auth/"
     },
     devtool: 'inline-source-map',
     plugins: [
@@ -44,7 +44,8 @@ let webpack_config = {
                 title: "Telos Auth",
                 template: path.resolve(__dirname,'templates/app', 'index.hbs'),
                 filename: 'index.html',
-                chunks: ['app']
+                chunks: ['app'],
+                publicPath: '/auth'
             }),
         new CopyWebpackPlugin({
             patterns: 
@@ -55,7 +56,7 @@ let webpack_config = {
                         force: true
                     },*/
                     {
-                        from: path.resolve(__dirname, 'node_modules/@ionic/core/dist/ionic/svg'),
+                        from: path.resolve(__dirname, '..', '..', 'node_modules/@ionic/core/dist/ionic/svg'),
                         to: path.resolve(__dirname, 'dist/svg')
                     },
                 ],

@@ -1,5 +1,6 @@
 const glob = require('glob');
 const path = require('path');
+const express = require('express');
 const routes = [];
 
 // Globbing routing files - auto-include all of our defined routes

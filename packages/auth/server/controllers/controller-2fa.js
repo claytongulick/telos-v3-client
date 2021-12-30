@@ -11,7 +11,11 @@ class Controller2FA {
             return res.status(400).json({status: 'error', message:'missing password'});
 
         /** @type User */
-        let user = User.findOne({where: {username}, attributes: ['id', 'username', 'roles', 'resource', 'hash', 'salt']});
+        let user = User.findOne(
+            {
+                where: {username}, 
+                attributes: ['id', 'username', 'roles', 'resource', 'hash', 'salt']
+            });
         await Authentication.startAuthFlow(req, user, "2fa");
         let password_is_valid = await user.checkPassword(password);
         if(!(password_is_valid === true)) {
@@ -30,3 +34,5 @@ class Controller2FA {
     }
 
 }
+
+module.exports = Controller2FA;

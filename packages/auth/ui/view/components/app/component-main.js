@@ -62,6 +62,7 @@ class ComponentMain extends HTMLElement {
         <ion-app>
             <ion-router @ionRouteDidChange=${(e) => this.handleRouteChange(e)}>
                 <ion-route url='/' component='scene-home'></ion-route>
+                <ion-route url='/password' component='scene-password'></ion-route>
             </ion-router>
             <ion-nav id="app_content" animated="true"></ion-nav>
             <ion-progress-bar style="opacity:0; transition: opacity 0.25s linear;" color="warning" type="indeterminate" value="0"></ion-progress-bar>
@@ -81,6 +82,11 @@ class ComponentMain extends HTMLElement {
         this.broker.addEventListener('loading_complete', this.handleLoadingComplete.bind(this));
         this.loading_controller = window.loadingController;
         this.progress_bar = this.querySelector('ion-progress-bar');
+        let preferred_method = ApplicationState.get('app.preferred_login_method');
+        if(preferred_method) {
+            let router = document.querySelector('ion-router');
+            router.push('/' + preferred_method);
+        }
     }
 
     async handleLoading() {
@@ -89,6 +95,10 @@ class ComponentMain extends HTMLElement {
 
     handleLoadingComplete() {
         this.progress_bar.style.opacity = 0;
+    }
+
+    handleRouteChange(e) {
+
     }
 }
 

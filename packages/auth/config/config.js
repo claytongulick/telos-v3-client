@@ -1,9 +1,5 @@
-/*
- *   Copyright (c) 2020 Ratio Software, LLC 
- *   All rights reserved.
- *   @author Clayton Gulick <clay@ratiosoftware.com>
- */
 const package_json = require('../package.json');
+const path = require('path');
 
 /**
  * 
@@ -82,8 +78,9 @@ let config = {
     },
     /** @type {import('../../common/server/express-server').ExpressConfig} */
     express: {
-        statics_dir: '/dist',
-        mount_path: '/admin',
+        package_json,
+        statics_dir: path.resolve(__dirname,'..','dist'),
+        mount_path: '/auth',
         force_ssl: false,
         enable_compression: true,
         compression_level: 6,
@@ -92,7 +89,7 @@ let config = {
             file_name: package_json.name,
             type: 'combined', //apache 'combine' format
             //this path must be writable by the user configured in the "run_as" setting
-            path: '/home/app/logs/admin', //if type is 'file' the folder to store log rotation
+            path: '/home/app/logs/auth', //if type is 'file' the folder to store log rotation
             rotation_interval: '1d' //rotate daily
         },
 

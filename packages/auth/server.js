@@ -13,8 +13,7 @@ dotenv.config({
     path: path.resolve(__dirname,'..','..','.env')
 });
 let config = require('./config/config');
-let logger = require('common/server/logging').getLogger(config);
-require('./server/classes/passport-utility').configurePassport();
+let logger = require('common/server/logging').getLogger(config.logging);
 let router = require('./server/routes');
 let ExpressServer = require('common/server/express-server')
 let app = ExpressServer(logger, [router], config.express);

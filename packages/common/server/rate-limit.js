@@ -4,17 +4,13 @@
  *   @author Clayton Gulick <clay@ratiosoftware.com>
  */
 const rateLimit = require('express-rate-limit');
-const config = require('../../env/config');
 
 /**
  * Simple utility for rate limiting that allows disabling via environment config
+ * Wraps express-rate-limit to provide options to enhace functionality globally
  */
 class RateLimiter {
     static limit(ms, request_count) {
-        if(config.disable_rate_limit) {
-            //just do a noop if rate limiting is disabled
-            return (req, res, next) => next();
-        }
 
         return rateLimit({
             windowMs: ms,

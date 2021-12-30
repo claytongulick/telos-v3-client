@@ -5,7 +5,7 @@
  */
 'use strict';
 
-let uuid = require('uuid/v4');
+let uuid = require('uuid').v4;
 let Encryption = require('common/server/encryption');
 let SMS = require('common/server/sms');
 let User = require('common/db/models/user');

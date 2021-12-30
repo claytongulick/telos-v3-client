@@ -4,8 +4,7 @@
  *   @author Clayton Gulick <clay@ratiosoftware.com>
  */
 const UserController = require('../controllers/controller-user'),
-    Authorization = require('../helpers/helper-authorization'),
-    Util = require('../helpers/helper-util');
+    Util = require('common/server/util');
 
 
 module.exports = (app) => {
@@ -17,28 +16,21 @@ module.exports = (app) => {
         .get(
             Util.wrap(UserController.getAvatar)
         );
+        
+    /**
+     * Return the current authenticated uid
+     */
+    app.route('/api/whoami')
+        .get( 
+            UserController.whoAmI 
+        );
 
+
+    /*
     app.route('/api/users/:user_id')
-        .all(Authorization.authenticateJWT())
         .get(
             Authorization.hasRole('self'),
             Util.wrap(UserController.getUser)
-        )
-        .patch(
-            Authorization.hasRole('self'),
-            Util.wrap(UserController.patchUser)
         );
-
-    app.route('/api/users')
-        .all(Authorization.authenticateJWT())
-        .get(
-            Authorization.hasRole('admin'),
-            Util.wrap(UserController.getUsers)
-        )
-        .post(
-            Authorization.hasRole('admin'),
-            //UploadHelper.uploadMiddleware('user').none(),
-            Util.wrap(UserController.createUser)
-        );
-
+    */
 }

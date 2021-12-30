@@ -2,7 +2,7 @@ const User = require('common/db/models/user');
 const Authentication = require('../classes/authentication');
 
 class ControllerPassword {
-    auth(req, res, next) {
+    static async loginWithPassword(req, res, next) {
         let username = req.body.username;
         let password = req.body.password;
 
