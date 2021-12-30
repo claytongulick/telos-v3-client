@@ -33,8 +33,7 @@ import { init } from "applicationstate/plugins/indexeddb";
 
 
 //load application state before we do anything else
-console.log('Starting up: ' + CLIENT_ID + ' admin');
-init(ApplicationState, CLIENT_ID + "_admin")
+init(ApplicationState, CLIENT_ID)
     .then(
         async () => {
             await defineCustomElements();

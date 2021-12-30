@@ -33,6 +33,13 @@ let schema = {
         allowNull: false
     },
 
+    /**
+     * Small image for the user
+     */
+    avatar: {
+        type: DataTypes.TEXT
+    },
+
     first_name: {
         type: DataTypes.STRING,
         allowNull: false

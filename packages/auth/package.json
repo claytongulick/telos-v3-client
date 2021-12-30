@@ -12,6 +12,7 @@
   "dependencies": {
     "@ionic/core": "^6.0.0",
     "applicationstate": "^0.3.0",
+    "databroker": "^0.2.3",
     "express": "^4.17.1",
     "fido2-lib": "^2.6.8",
     "twilio": "^3.72.0",

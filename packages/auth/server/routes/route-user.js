@@ -26,11 +26,9 @@ module.exports = (app) => {
         );
 
 
-    /*
-    app.route('/api/users/:user_id')
+    app.route('/api/users/:email_address')
         .get(
             Authorization.hasRole('self'),
-            Util.wrap(UserController.getUser)
+            Util.wrap(UserController.getBasicUser)
         );
-    */
 }

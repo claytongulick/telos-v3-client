@@ -3,9 +3,9 @@ const aqp = require('api-query-params');
 
 class UserController {
 
-    static async getUser(req, res, next) {
-        const user_id = req.params.user_id;
-        const user = await User.findOne({where: {id: user_id}});
+    static async getBasicUser(req, res, next) {
+        const email_address = req.params.email_address;
+        const user = await User.findOne({where: {email_address}, attributes: ['id','avatar','first_name']});
         if(!user) 
             return res.status(404).json({status: 'error', message: 'user not found'})
 

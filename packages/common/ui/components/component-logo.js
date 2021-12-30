@@ -4,6 +4,7 @@
  *   @author Clayton Gulick <clay@ratiosoftware.com>
  */
 import {html, svg, render} from 'lit/html.js';
+import logo_file from '../assets/logo-white.png';
 
 class ComponentLogo extends HTMLElement {
 
@@ -23,7 +24,7 @@ class ComponentLogo extends HTMLElement {
 
     connectedCallback() {
         this.template = () => html`
-            <img src="./assets/logo-white.png" style="height:35px;">
+            <img src=${logo_file} style="height:35px;">
             
         `;
 

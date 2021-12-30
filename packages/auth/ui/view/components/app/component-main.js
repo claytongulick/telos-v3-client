@@ -11,6 +11,10 @@ import {Broker} from 'databroker';
 import SceneHome from '../scene/scene-home';
 import ApplicationState from 'applicationstate';
 
+import sign_in_image from '../../../image/sign_in.svg';
+
+import ApplicationLogo from 'common/ui/components/component-logo';
+
 
 /**
  * This is the main application class
@@ -64,13 +68,23 @@ class ComponentMain extends HTMLElement {
                 <ion-route url='/' component='scene-home'></ion-route>
                 <ion-route url='/password' component='scene-password'></ion-route>
             </ion-router>
-            <ion-nav id="app_content" animated="true"></ion-nav>
+            <div >
+                <div style="height: 50px; width: 100%; background-color: var(--ion-color-primary); display: flex; flex-direction: row; align-items: center; justify-content: center;">
+                    <app-logo style="height: 35px; margin-top: 0px" .mode=${'text'}></app-logo>
+                </div>
+            </div>
+            <ion-split-pane style="margin-top: 50px;" content-id="app_content">
+                <div id="content_image" style="padding: 15px">
+                    <ion-img src=${sign_in_image} style="width: 100%"></ion-img>
+                </div>
+                <ion-nav id="app_content" animated="true"></ion-nav>
+            </ion-split-pane>
             <ion-progress-bar style="opacity:0; transition: opacity 0.25s linear;" color="warning" type="indeterminate" value="0"></ion-progress-bar>
         </ion-app>
             `;
 
-            this.render();
-            this.init();
+        this.render();
+        this.init();
     }
 
     render() {

@@ -20,6 +20,10 @@ import {defineCustomElements} from '@ionic/core/dist/esm/loader';
 import '@ionic/core/css/ionic.bundle.css';
 import 'common/ui/css/theme.css';
 
+//configure the databroker to prefix with /admin
+import {Broker} from "databroker";
+Broker.config.base_url='/auth';
+
 //the main application component
 import Main from './view/components/app/component-main';
 
@@ -28,8 +32,7 @@ import ApplicationState from "applicationstate";
 import { init } from "applicationstate/plugins/indexeddb";
 
 //load application state before we do anything else
-console.log('Starting up: ' + CLIENT_ID + ' admin');
-init(ApplicationState, CLIENT_ID + "_admin")
+init(ApplicationState, CLIENT_ID)
     .then(
         async () => {
             await defineCustomElements();
