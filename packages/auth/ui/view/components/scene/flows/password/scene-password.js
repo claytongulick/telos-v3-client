@@ -1,18 +1,21 @@
 import {html, render} from 'lit/html.js';
+import ApplicationState from 'applicationstate';
 
-class SceneHome extends HTMLElement {
+class ScenePassword extends HTMLElement {
     connectedCallback() {
         this.template = (data) => html`
             <style>
             </style>
 
             <ion-content padding style="text-align: center;">
-                <h1>Hi!</h1>
-                <h2>To get started, log in below with your email address</h2>
                 <ion-item>
-                    <ion-label position="floating">Email address</ion-label>
+                    <ion-label position="floating">Password</ion-label>
                     <ion-input></ion-input>
                 </ion-item>
+                <div @click=${e => this.handleDifferentLogin()}
+                    style="color: var(--ion-color-secondary); font-size: 10px; margin-top: 10px; font-style: underline;">
+                    I'd like to log in a different way
+                </div>
             </ion-content>
         `;
 
@@ -20,6 +23,13 @@ class SceneHome extends HTMLElement {
 
     }
 
+    async handleDifferentLogin() {
+        ApplicationState.set('app.preferred_login_method','');
+        let router = document.querySelector('ion-router');
+        await router.push('/','back');
+
+    }
+
 }
-customElements.define('scene-home', SceneHome);
-export default SceneHome;
+customElements.define('scene-password', ScenePassword);
+export default ScenePassword;

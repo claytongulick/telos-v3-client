@@ -10,6 +10,7 @@
   "author": "Clayton C Gulick",
   "license": "UNLICENSED",
   "dependencies": {
+    "@braintree/sanitize-url": "^5.0.2",
     "@ionic/core": "^6.0.0",
     "applicationstate": "^0.3.0",
     "databroker": "^0.2.3",

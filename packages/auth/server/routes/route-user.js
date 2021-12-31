@@ -7,12 +7,12 @@ const UserController = require('../controllers/controller-user'),
     Util = require('common/server/util');
 
 
-module.exports = (app) => {
+module.exports = (router) => {
 
     /**
      * This is unauthenticated - we allow user profile without auth
      */
-    app.route('/api/users/:user_id/avatar')
+    router.route('/api/users/:user_id/avatar')
         .get(
             Util.wrap(UserController.getAvatar)
         );
@@ -20,15 +20,14 @@ module.exports = (app) => {
     /**
      * Return the current authenticated uid
      */
-    app.route('/api/whoami')
+    router.route('/api/whoami')
         .get( 
             UserController.whoAmI 
         );
 
 
-    app.route('/api/users/:email_address')
+    router.route('/api/users/:email_address')
         .get(
-            Authorization.hasRole('self'),
             Util.wrap(UserController.getBasicUser)
         );
 }

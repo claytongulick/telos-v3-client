@@ -228,7 +228,7 @@ module.exports = function (logger, routers, config, middleware) {
         logger.error(err.stack);
         try {
             await ErrorLog.create({
-                error_type: typeof err,
+                error_type: err.name,
                 code: err.code,
                 message: err.message,
                 stack_trace: err.stack,

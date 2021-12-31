@@ -9,6 +9,7 @@ import { loadingController, alertController, modalController, toastController, p
 import {Broker} from 'databroker';
 
 import SceneHome from '../scene/scene-home';
+import ScenePassword from '../scene/flows/password/scene-password';
 import ApplicationState from 'applicationstate';
 
 import sign_in_image from '../../../image/sign_in.svg';
@@ -63,7 +64,7 @@ class ComponentMain extends HTMLElement {
 
     connectedCallback() {
         this.template = () => html`
-        <ion-app>
+        <ion-app mode="ios">
             <ion-router @ionRouteDidChange=${(e) => this.handleRouteChange(e)}>
                 <ion-route url='/' component='scene-home'></ion-route>
                 <ion-route url='/password' component='scene-password'></ion-route>
@@ -96,11 +97,6 @@ class ComponentMain extends HTMLElement {
         this.broker.addEventListener('loading_complete', this.handleLoadingComplete.bind(this));
         this.loading_controller = window.loadingController;
         this.progress_bar = this.querySelector('ion-progress-bar');
-        let preferred_method = ApplicationState.get('app.preferred_login_method');
-        if(preferred_method) {
-            let router = document.querySelector('ion-router');
-            router.push('/' + preferred_method);
-        }
     }
 
     async handleLoading() {

@@ -5,7 +5,7 @@ class UserController {
 
     static async getBasicUser(req, res, next) {
         const email_address = req.params.email_address;
-        const user = await User.findOne({where: {email_address}, attributes: ['id','avatar','first_name']});
+        const user = await User.findOne({where: {email_address}, attributes: ['id','avatar','first_name','email_address']});
         if(!user) 
             return res.status(404).json({status: 'error', message: 'user not found'})
 
