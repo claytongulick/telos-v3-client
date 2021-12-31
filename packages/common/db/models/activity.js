@@ -1,6 +1,6 @@
 const { DataTypes, Model } = require('sequelize');
 /**
- * @typedef {Object} Activity
+ * @typedef {Object} ActivitySchema
  * @property {number} id The unique id for the activity
  * @property {string} user_id The UUID for the user that performed the activity
  * @property {string} client_id The client if of the user that performed the activity
@@ -26,7 +26,7 @@ let schema = {
      */
     user_id: {
         type: DataTypes.UUID,
-        allowNull: false,
+        allowNull: true, //this could be a system activity
     },
 
     /**
@@ -70,6 +70,13 @@ let schema = {
  */
 class Activity extends Model {
 
+    /**
+     * @param {ActivitySchema} activity 
+     */
+    static async log(activity) {
+        await Activity.create(activity);
+    }
+
 }
 
 let sequelize = require('../sequelize').get(process.env.CLIENT_DB_URI);
@@ -87,22 +94,5 @@ let model_options = {
     ]
 }
 
-let admin_options = {
-    actions: {
-        edit: {
-            isVisible: false
-        },
-        delete: {
-            isVisible: false
-        },
-        bulkDelete: {
-            isVisible: false
-        },
-        new: {
-            isVisible: false
-        }
-    }
-};
 Activity.init(schema, model_options);
-Activity.admin_options = admin_options;
 module.exports = Activity;

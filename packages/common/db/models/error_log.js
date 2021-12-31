@@ -47,12 +47,18 @@ let schema = {
 
     /**
      * Indicates the severity of the error, 1-4
+     * 0 - Unknown
      * 1 - Critical error, a crucial error that represents a need for immediate attention from support staff and others
      * 2 - Severe error, an error that represents a need for attention from support staff
      * 3 - Unexpected error, an error that was not expected but doesn't affect system performance or operation
      * 4 - Expected error, an error that occurs commonly and is an expected error condition. Logged for information purposes
      */
     severity: DataTypes.INTEGER,
+
+    /**
+     * If this error references a system object, this is the ID
+     */
+    reference_id: DataTypes.STRING,
 
     /**
      * Indicates that any notification subscribers have been sent notifications
@@ -84,23 +90,6 @@ let model_options = {
     ]
 }
 
-let admin_options = {
-    actions: {
-        edit: {
-            isVisible: false
-        },
-        delete: {
-            isVisible: false
-        },
-        bulkDelete: {
-            isVisible: false
-        },
-        new: {
-            isVisible: false
-        }
-    }
-}
 
 ErrorLog.init(schema, model_options);
-ErrorLog.admin_options = admin_options;
 module.exports = ErrorLog;

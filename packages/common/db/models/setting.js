@@ -111,11 +111,5 @@ let model_options = {
     updatedAt: 'update_date'
 }
 
-let admin_options = {
-
-}
-
 Setting.init(schema, model_options);
-Setting.admin_options = admin_options;
-
 module.exports = Setting;

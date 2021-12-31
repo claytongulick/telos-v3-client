@@ -182,10 +182,5 @@ let model_options = {
     }
 }
 
-let admin_options = {
-
-}
-
 User.init(schema, model_options);
-User.admin_options = admin_options;
 module.exports = User;

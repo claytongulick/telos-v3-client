@@ -13,8 +13,8 @@ const path = require('path');
  * /etc/environment should be sourced in systemd unit files via EnvironmentFile=/etc/environment
  * 
  * @typedef {Object} EmailConfig
- * @property {Object} sendgrid Sendgrid config
- * @property {string} sendgrid.api_key The key to use for sendgrid
+ * @property {Object} provider Sendgrid config
+ * @property {string} provider.api_key The key to use for sendgrid
  * @property {string} from_address The address to send the email from
  * 
  * @typedef {Object} SMSConfig
@@ -95,8 +95,8 @@ let config = {
 
     },
     email: {
-        sendgrid: {
-            api_key: process.env.SENDGRID_API_KEY,
+        provider: {
+            api_key: process.env.EMAIL_API_KEY,
         },
         from_address: process.env.FROM_EMAIL_ADDRESS
     },

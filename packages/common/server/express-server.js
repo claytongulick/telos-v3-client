@@ -232,7 +232,9 @@ module.exports = function (logger, routers, config, middleware) {
                 code: err.code,
                 message: err.message,
                 stack_trace: err.stack,
-                application: config?.package_json?.name
+                application: config?.package_json?.name,
+                reference_id: err.reference_id,
+                severity: err.severity || 0,
             });
         }
         catch (err) {
