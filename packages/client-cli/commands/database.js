@@ -18,6 +18,13 @@ let init_functions = {
         for(let default_setting of default_settings) {
             await Setting.create(Settings.config[default_setting]);
         }
+    },
+    communication: async function() {
+        let templates = require('common/db/fixtures/communication_templates');
+        let CommunicationTemplate = Models.CommunicationTemplate;
+        for(let template of templates) {
+            await CommunicationTemplate.create(template); //this will compile the template and save it
+        }
     }
 }
 
@@ -30,6 +37,10 @@ let destroy_functions = {
     settings:  async function() {
         let Setting = Models.Setting;
         await Setting.destroy({truncate: true});
+    },
+    communication: async function() {
+        let CommunicationTemplate = Models.CommunicationTemplate;
+        await CommunicationTemplate.destroy({truncate: true});
     }
 }
 
@@ -48,7 +59,7 @@ class DatabaseCommands {
 
     static async init(options) {
         const sequelize = await require('common/db/sequelize').connect(process.env.CLIENT_DB_URI);
-        let valid_fixtures = ['users','settings'];
+        let valid_fixtures = ['users','settings','communication'];
 
         if(options.all) {
             if(options.destroy) {

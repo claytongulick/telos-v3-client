@@ -34,7 +34,7 @@ let schema = {
     /**
      * Pre-compiled template
      */
-    compiled: DataTypes.JSONB
+    compiled: DataTypes.TEXT
 
 }
 
@@ -68,10 +68,10 @@ let model_options = {
     ],
     hooks: {
         beforeCreate: (communication_template, options) => {
-            this.compiled = handlebars.precompile(communication_template.content);
+            communication_template.compiled = handlebars.precompile(communication_template.content);
         },
         beforeSave: (communication_template, options) => {
-            this.compiled = handlebars.precompile(communication_template.content);
+            communication_template.compiled = handlebars.precompile(communication_template.content);
         }
     }
 }

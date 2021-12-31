@@ -8,6 +8,7 @@
   "author": "Clayton C Gulick",
   "license": "UNLICENSED",
   "dependencies": {
+    "@sendgrid/mail": "^7.6.0",
     "commander": "^8.3.0",
     "compression": "^1.7.4",
     "connect-pg-simple": "^7.0.0",
