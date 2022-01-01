@@ -16,6 +16,20 @@ class SceneHome extends HTMLElement {
             avatar: '',
             first_name: '',
         }
+        ApplicationState.listen('app.login_user', (user) => {
+            if(!user) {
+                this.user = {avatar:'',first_name:''};
+                this.fade_animation.destroy();
+                this.show_animation.destroy();
+                let pick_login_element = this.querySelector('#pick_login');
+                let collect_email_element = this.querySelector("#collect_email");
+                collect_email_element.style.display = 'block';
+                collect_email_element.style.opacity = '1';
+                pick_login_element.style.opacity = '0';
+                this.email_address = '';
+            }
+            this.render();
+        })
         this.broker = new Broker();
     }
     connectedCallback() {
@@ -62,7 +76,7 @@ class SceneHome extends HTMLElement {
                                     </ion-radio-group>
                                     <ion-label color="danger" style="margin-top: 10px; display: block;">${this.error_message}</ion-label>
                                     <ion-item lines="none" >
-                                        <ion-button size="default" slot="end">Next</ion-button>
+                                        <ion-button @click=${e => this.handleSelectLoginMethod(e)} size="default" slot="end">Next</ion-button>
                                     </ion-item>
                                     <ion-item lines="none" style="margin-top: 20px; font-size: 12px;">
                                         <ion-checkbox style="height: 16px; width: 16px;" @ionChange=${e => this.handleRememberLoginMethod(e)}></ion-checkbox>
@@ -133,17 +147,17 @@ class SceneHome extends HTMLElement {
         }
         let pick_login_element = this.querySelector('#pick_login');
         let collect_email_element = this.querySelector("#collect_email");
-        let fade_animation = createAnimation()
+        this.fade_animation = createAnimation()
             .addElement(collect_email_element)
             .duration(300)
             .fromTo('opacity','1','0')
             .afterStyles({display: 'none'});
-        let show_animation = createAnimation()
+        this.show_animation = createAnimation()
             .addElement(pick_login_element)
             .duration(300)
             .fromTo('opacity','0','1');
-        await fade_animation.play();
-        await show_animation.play();
+        await this.fade_animation.play();
+        await this.show_animation.play();
     }
 
     async handleSelectLoginMethod(e) {
