@@ -12,6 +12,7 @@
     "commander": "^8.3.0",
     "compression": "^1.7.4",
     "connect-pg-simple": "^7.0.0",
+    "connect-session-sequelize": "^7.1.2",
     "fast-json-patch": "^3.1.0",
     "json-patch-rules": "^0.1.0",
     "lit": "^2.0.2",

@@ -15,6 +15,8 @@ async function main() {
         .command('create')
         .description('Create the client database schema')
         .option('-f, --force', 'Drop existing tables if they exist and recreate them')
+        .option('-s, --session', 'Create session database. If --force is passed will also destroy the session database. This option will result in an error if NODE_ENV=="production"')
+        .option('-y, --seriously', 'Pass this option if you seriously want to modify the session database in production. If this is not passed, this process will refuse to modify session in prod. Only do this if you seriously know what youre doing. Seriously.')
         .action(async (options, command) => {
             await DatabaseCommands.create(options);
         });

@@ -102,6 +102,13 @@ class ComponentMain extends HTMLElement {
         this.broker.addEventListener('loading_complete', this.handleLoadingComplete.bind(this));
         this.loading_controller = window.loadingController;
         this.progress_bar = this.querySelector('ion-progress-bar');
+        let url = new URL(window.location);
+        let redirect_url = url.searchParams.get('redirect_url');
+        if(redirect_url)
+            ApplicationState.set('app.redirect_url', redirect_url, {persist: false});
+        else
+            ApplicationState.rm('app.redirect_url');
+
     }
 
     async handleLoading() {

@@ -10,7 +10,9 @@ class RedirectController {
      */
     static async redirect(req, res, next) {
         let user = req.session.user;
-        if(!user.trusted)
+        if(!user)
+            return res.redirect('/auth');
+        if(!req.session.trusted)
             return res.redirect('/auth');
 
         let redirect_url = req.query.redirect_url;

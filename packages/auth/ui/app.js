@@ -23,6 +23,11 @@ import 'common/ui/css/theme.css';
 //configure the databroker to prefix with /admin
 import {Broker} from "databroker";
 Broker.config.base_url='/auth';
+Broker.config.default_options.get.credentials = 'same-origin';
+Broker.config.default_options.put.credentials = 'same-origin';
+Broker.config.default_options.post.credentials = 'same-origin';
+Broker.config.default_options.patch.credentials = 'same-origin';
+Broker.config.default_options.del.credentials = 'same-origin';
 
 //the main application component
 import Main from './view/components/app/component-main';

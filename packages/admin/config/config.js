@@ -97,6 +97,7 @@ let config = {
             path: '/home/app/logs/admin', //if type is 'file' the folder to store log rotation
             rotation_interval: '1d' //rotate daily
         },
+        is_proxied: true
 
     },
     email: {

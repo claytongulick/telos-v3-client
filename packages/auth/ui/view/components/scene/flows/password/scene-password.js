@@ -1,9 +1,12 @@
 import {html, render} from 'lit/html.js';
 import ApplicationState from 'applicationstate';
+import {Broker} from 'databroker';
+import Messaging from 'common/ui/utility/messaging';
 
 class ScenePassword extends HTMLElement {
     constructor() {
         super();
+        this.broker = new Broker();
         this.user = ApplicationState.get('app.login_user');
         ApplicationState.listen('app.login_user', (user) => {
             this.user = user;
@@ -23,7 +26,7 @@ class ScenePassword extends HTMLElement {
                             <h2 style="font-size: 1.2em; color: var(--ion-color-step-700)">To log in as ${this.user.email_address} just enter your password below.</h2>
                             <ion-item>
                                 <ion-label position="floating">Password</ion-label>
-                                <ion-input @keydown=${e => {
+                                <ion-input id='login_password' @keydown=${e => {
                                     if(e.keyCode == 13) {
                                         this.handleLogin();
                                     }
@@ -65,7 +68,30 @@ class ScenePassword extends HTMLElement {
     }
 
     async handleLogin() {
+        let router = document.querySelector('ion-router');
+        let username = ApplicationState.get('app.login_email_address');
+        let password = this.querySelector('#login_password').value;
+        if(!username)
+            router.push('/');
+        if(!password)
+            Messaging.toast('Please enter a password to log in');
 
+        try {
+            await this.broker.post(`/api/password`, { username, password });
+            let redirect_url = ApplicationState.get('app.redirect_url');
+            if(redirect_url)
+                window.location = '/auth/redirect?redirect_url=' + redirect_url;
+            else
+                window.location= '/auth/redirect';
+        }
+        catch(err) {
+            if(err.code == '403') {
+                return Messaging.toast("There was an error logging you in, please check your password and try again.")
+            }
+            else {
+                return Messaging.toast("There was an internal error when trying to log you in. Please try a different login method. If this problem persists, please contact support.")
+            }
+        }
     }
 
     async handleDifferentLogin() {

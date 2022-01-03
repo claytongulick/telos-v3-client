@@ -46,19 +46,30 @@ let destroy_functions = {
 
 class DatabaseCommands {
     static async create(options) {
-        const sequelize = await require('common/db/sequelize').connect(process.env.CLIENT_DB_URI);
+        const sequelize = await require('common/db/sequelize').connect('client');
         await sequelize.sync({ force: options.force });
+        if(options.session) {
+            if((!options.seriously) && process.env.NODE_ENV == 'production') {
+                throw new Error("Refusing to modify session table in production. Consider your wrist to be slapped. Don't do this again.");
+            }
+            if(process.env.NODE_ENV == 'production') {
+                console.warn("Modifying production session table. I hope you know what you're doing.");
+            }
+            const session_sequelize = await require('common/db/sequelize').connect('session');
+            let Session = require('common/db/models/session');
+            await session_sequelize.sync({ force: options.force });
+        }
         sequelize.close();
     }
 
     static async drop(options) {
-        const sequelize = await require('common/db/sequelize').connect(process.env.CLIENT_DB_URI);
+        const sequelize = await require('common/db/sequelize').connect('client');
         await sequelize.drop();
         sequelize.close();
     }
 
     static async init(options) {
-        const sequelize = await require('common/db/sequelize').connect(process.env.CLIENT_DB_URI);
+        const sequelize = await require('common/db/sequelize').connect('client');
         let valid_fixtures = ['users','settings','communication'];
 
         if(options.all) {

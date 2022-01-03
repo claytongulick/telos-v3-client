@@ -19,7 +19,12 @@ const helmet = require('helmet');
 const methodOverride = require('method-override');
 const path = require('path');
 const session = require('express-session');
-const pg_store = require('connect-pg-simple')(session);
+//const pg_store = require('connect-pg-simple')(session);
+// initalize sequelize with session store
+let SequelizeStore = require("connect-session-sequelize")(session.Store);
+let session_db = require('common/db/sequelize').get('session');
+//This is needed, even though Session isn't used in order to register the model with Sequelize
+let Session = require('common/db/models/session');
 const program = require('commander');
 const rfs = require('rotating-file-stream');
 
@@ -39,7 +44,9 @@ const { ErrorLog } = require('../db/models');
  * @property {boolean} enable_compression Whether the server should compress results
  * @property {number} compression_level How much compression should be used
  * @property {string | Array} statics_dir The director(ies) static files should be served from
+ * @property {boolean} is_proxied Indicates whether the application is running behind a proxy
  * @property {WebLogsConfig} web_logs Web logs configuration
+ * 
  * 
  * @param {*} logger 
  * @param {ExpressConfig} config 
@@ -56,7 +63,10 @@ module.exports = function (logger, routers, config, middleware) {
     // Initialize express app
     let app = express();
     app.set('logger', logger);
-    app.set('trust proxy', true);
+
+    //are we running behind a proxy?
+    if(config.is_proxied)
+        app.set('trust proxy', 1);
 
     // Use helmet to secure Express headers
     app.use(helmet.frameguard('sameorigin'));
@@ -125,7 +135,7 @@ module.exports = function (logger, routers, config, middleware) {
             let request_host = req.headers.host;
             let cookie_host_domain;
             //for local development
-            if (request_host == 'localhost') {
+            if (request_host.startsWith('localhost')) {
                 cookie_host_domain = 'localhost';
             }
             else {
@@ -144,22 +154,26 @@ module.exports = function (logger, routers, config, middleware) {
                 resave: false,
                 cookie: {
                     httpOnly: true,
-                    secure: true,
+                    secure: !(process.env.NODE_ENV === 'local'),
                     sameSite: 'strict',
                     domain: cookie_host_domain,
+                    proxy: config.is_proxied,
                     maxAge: process.env.SESSION_MAX_AGE || (1000 * 60 * 20) //default to 20 mins if not set
                 }
             }
 
-
-            if (process.env.ENABLE_PG_SESSION) {
-                let pg = require('pg');
-                let pool = new pg.Pool({
-                    connectionTimeoutMillis: 2000,
-                    connectionString: process.env.SESSION_DB_URI
-                });
-                session_options.store = new pg_store()
-            }
+            session_options.store = new SequelizeStore({
+                db: session_db,
+                table: 'Session',
+                extendDefaultFields: (defaults, session) => {
+                    return {
+                        data: defaults.data,
+                        expires: defaults.expires,
+                        user_id: session?.user?.id,
+                        client_id: process.env.CLIENT_ID
+                      };
+                }
+            });
 
             let dynamic_session = session(session_options);
             dynamic_session(req, res, next);

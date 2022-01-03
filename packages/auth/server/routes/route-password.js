@@ -5,6 +5,6 @@ module.exports = (router) => {
     /**
      * Log in with normal username and password. This returns a JWT.
      */
-    router.route('/api/login').post( Util.wrap(PasswordController.loginWithPassword) );
+    router.route('/api/password').post( Util.wrap(PasswordController.loginWithPassword) );
 
 }
