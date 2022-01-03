@@ -70,6 +70,7 @@ class ScenePassword extends HTMLElement {
 
     async handleDifferentLogin() {
         ApplicationState.set('app.preferred_login_method','');
+        ApplicationState.set('app.side_image','');
         let router = document.querySelector('ion-router');
         await router.push('/','back');
 
@@ -79,6 +80,7 @@ class ScenePassword extends HTMLElement {
         ApplicationState.set('app.preferred_login_method','');
         ApplicationState.set('app.login_user','');
         ApplicationState.set('app.login_email_address','');
+        ApplicationState.set('app.side_image','');
 
         let router = document.querySelector('ion-router');
         await router.push('/','back');

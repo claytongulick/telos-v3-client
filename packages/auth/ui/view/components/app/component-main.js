@@ -4,7 +4,7 @@
  *   @author Clayton Gulick <clay@ratiosoftware.com>
  */
 import {html, render} from 'lit/html.js';
-import { loadingController, alertController, modalController, toastController, pickerController, actionSheetController } from '@ionic/core';
+import { loadingController, alertController, modalController, toastController, pickerController, actionSheetController, createAnimation } from '@ionic/core';
 
 import {Broker} from 'databroker';
 
@@ -13,6 +13,7 @@ import ScenePassword from '../scene/flows/password/scene-password';
 import ApplicationState from 'applicationstate';
 
 import sign_in_image from '../../../image/sign_in.svg';
+import sign_in_password from '../../../image/sign_in_password.svg'
 
 import ApplicationLogo from 'common/ui/components/component-logo';
 
@@ -60,6 +61,10 @@ class ComponentMain extends HTMLElement {
         window.addEventListener('error',async (e) => {await handleError(e.message) });
         window.onunhandledrejection = async (e) => {await handleError(e.reason) };
 
+        ApplicationState.listen('app.side_image', (image) => {
+            this.setImage(image);
+        });
+
     }
 
     connectedCallback() {
@@ -70,13 +75,13 @@ class ComponentMain extends HTMLElement {
                 <ion-route url='/password' component='scene-password'></ion-route>
             </ion-router>
             <div >
-                <div style="height: 50px; width: 100%; background-color: var(--ion-color-primary); display: flex; flex-direction: row; align-items: center; justify-content: center;">
-                    <app-logo style="height: 35px; margin-top: 0px" .mode=${'text'}></app-logo>
+                <div style="height: 50px; width: 100%; background-color: var(--ion-color-primary); display: flex; flex-direction: row; align-items: center; justify-content: flex-start;">
+                    <app-logo style="margin-left: 25px;height: 35px; margin-top: 0px" .mode=${'text'}></app-logo>
                 </div>
             </div>
             <ion-split-pane style="margin-top: 50px;" content-id="app_content">
                 <div id="content_image" style="padding: 15px">
-                    <ion-img src=${sign_in_image} style="width: 100%"></ion-img>
+                    <ion-img id="side_image" src=${sign_in_image} style="width: 100%"></ion-img>
                 </div>
                 <ion-nav id="app_content" animated="true"></ion-nav>
             </ion-split-pane>
@@ -109,6 +114,29 @@ class ComponentMain extends HTMLElement {
 
     handleRouteChange(e) {
 
+    }
+
+    async setImage(image) {
+        if(this.image == image)
+            return;
+
+        let side_image_element = this.querySelector('#side_image');
+        let fade_out = createAnimation()
+            .addElement(side_image_element)
+            .duration(300)
+            .fromTo('opacity','1','0');
+        let fade_in = createAnimation()
+            .addElement(side_image_element)
+            .duration(300)
+            .fromTo('opacity','0','1');
+
+        await fade_out.play();
+        if(image == '')
+            side_image_element.src = sign_in_image;
+        if(image == 'password')
+            side_image_element.src = sign_in_password;
+        await fade_in.play();
+        this.image = image;
     }
 }
 

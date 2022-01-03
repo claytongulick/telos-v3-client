@@ -19,8 +19,14 @@ class SceneHome extends HTMLElement {
         ApplicationState.listen('app.login_user', (user) => {
             if(!user) {
                 this.user = {avatar:'',first_name:''};
-                this.fade_animation.destroy();
-                this.show_animation.destroy();
+                if(this.fade_animation) {
+                    this.fade_animation.destroy();
+                    delete this.fade_animation;
+                }
+                if(this.show_animation) {
+                    this.show_animation.destroy();
+                    delete this.show_animation;
+                }
                 let pick_login_element = this.querySelector('#pick_login');
                 let collect_email_element = this.querySelector("#collect_email");
                 collect_email_element.style.display = 'block';
@@ -127,18 +133,7 @@ class SceneHome extends HTMLElement {
             ApplicationState.set('app.login_user',this.user, {persist: false});
             this.render();
             let preferred_method = ApplicationState.get('app.preferred_login_method');
-            let router = document.querySelector('ion-router');
-            switch(preferred_method) {
-                case "password":
-                    await router.push('/password');
-                    return;
-                case "otp-email":
-                    await this.sendOTP('email');
-                    return;
-                case "otp-sms":
-                    await this.sendOTP('sms');
-                    return;
-            }
+            await this.navigateNextStep(preferred_method);
 
         }
         catch(err) {
@@ -162,8 +157,24 @@ class SceneHome extends HTMLElement {
 
     async handleSelectLoginMethod(e) {
         let login_method_element = this.querySelector('#login_method');
+        await this.navigateNextStep(login_method_element.value);
+    }
+
+    async navigateNextStep(preferred_method) {
         let router = document.querySelector('ion-router');
-        await router.push('/' + login_method_element.value);
+        switch (preferred_method) {
+            case "password":
+                ApplicationState.set('app.side_image', 'password');
+                await router.push('/password');
+                return;
+            case "otp-email":
+                await this.sendOTP('email');
+                return;
+            case "otp-sms":
+                await this.sendOTP('sms');
+                return;
+        }
+
     }
 
     async sendOTP(type) {
