@@ -58,6 +58,7 @@ class OTPController {
             subject: 'Your Telos login code',
             from_address: 'support@teloshs.com',
             first_name: user.first_name,
+            url: `${process.env.HOSTNAME}/auth`,
             code: user.otp_code.toUpperCase()
         }
 

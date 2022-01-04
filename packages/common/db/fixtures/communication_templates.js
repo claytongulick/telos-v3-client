@@ -13,7 +13,7 @@ let templates = [
         name: 'login-otp-sms',
         content:`Hi {{titleize first_name}}, Here's your code to log in: {{{code}}}.
 
-        @{{{fields.url}}} #{{{fields.code}}}`
+        @{{{url}}} #{{{code}}}`
     }
 
 ];
