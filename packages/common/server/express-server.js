@@ -86,45 +86,6 @@ module.exports = function (logger, routers, config, middleware) {
     app.use(helmet.referrerPolicy());
     app.use(helmet.xssFilter());
 
-    // Request body parsing middleware should be above methodOverride
-    app.use(bodyParser.json({ limit: '10mb' }));
-    app.use(bodyParser.urlencoded({
-        extended: true,
-        limit: '10mb'
-    }));
-
-    // Should be placed before express.static
-    app.use(compression());
-
-    //configure statics
-    if (typeof config.statics_dir == 'string')
-        //e-tags are calculated at request time, the whole file is read. We'll use last-modified for caching
-        app.use(config.mount_path, express.static(config.statics_dir, { etag: false }));
-    else if (Array.isArray(config.statics_dir) && config.statics_dir.length > 1)
-        config.statics_dir.forEach(
-            function (dir) {
-                app.use(config.mount_path, express.static(path.resolve(dir), { etag: false }));
-            }
-        );
-
-    //set up http request logging
-    if (['development', 'qa', 'production'].includes(process.env.NODE_ENV)) {
-        var accessLogStream = rfs(config.web_logs.file_name, {
-            interval: config.web_logs.rotation_interval,
-            path: config.web_logs.path
-        });
-        app.use(morgan(config.web_logs.type, { stream: accessLogStream }));
-    }
-    else {
-        app.use(morgan(config.web_logs.type));
-    }
-
-    //make json output pretty
-    app.set('json spaces', 2);
-
-    //disable any sort of view caching
-    app.set('view cache', false);
-
     //set up dynamic session based on the hostname that came into this IP. 
     //this is to support *.teloshs.com as well as whitelabeled domains
     app.use((req, res, next) => {
@@ -222,6 +183,52 @@ module.exports = function (logger, routers, config, middleware) {
         }
     });
 
+    //register any additional middleware the server wants
+    if (middleware && Array.isArray(middleware)) {
+        for (let m of middleware)
+            app.use(m)
+    }
+
+    // Request body parsing middleware should be above methodOverride
+    app.use(bodyParser.json({ limit: '10mb' }));
+    app.use(bodyParser.urlencoded({
+        extended: true,
+        limit: '10mb'
+    }));
+
+    // Should be placed before express.static
+    app.use(compression());
+
+    //configure statics
+    if (typeof config.statics_dir == 'string')
+        //e-tags are calculated at request time, the whole file is read. We'll use last-modified for caching
+        app.use(config.mount_path, express.static(config.statics_dir, { etag: false }));
+    else if (Array.isArray(config.statics_dir) && config.statics_dir.length > 1)
+        config.statics_dir.forEach(
+            function (dir) {
+                app.use(config.mount_path, express.static(path.resolve(dir), { etag: false }));
+            }
+        );
+
+    //set up http request logging
+    if (['development', 'qa', 'production'].includes(process.env.NODE_ENV)) {
+        var accessLogStream = rfs(config.web_logs.file_name, {
+            interval: config.web_logs.rotation_interval,
+            path: config.web_logs.path
+        });
+        app.use(morgan(config.web_logs.type, { stream: accessLogStream }));
+    }
+    else {
+        app.use(morgan(config.web_logs.type));
+    }
+
+    //make json output pretty
+    app.set('json spaces', 2);
+
+    //disable any sort of view caching
+    app.set('view cache', false);
+
+
     //allow the use of modern http verbs for older clients that might not support them (PUT, etc...)
     app.use(methodOverride());
 
@@ -231,11 +238,6 @@ module.exports = function (logger, routers, config, middleware) {
         app.use(router.__telos_mount_path || config.mount_path || '/', router);
     }
 
-    //register any additional middleware the server wants
-    if (middleware && Array.isArray(middleware)) {
-        for (let m of middleware)
-            app.use(m)
-    }
 
     //logging error handler
     app.use(async (err, req, res, next) => {

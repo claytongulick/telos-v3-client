@@ -19,18 +19,32 @@ let router = require('./server/routes');
 let ExpressServer = require('common/server/express-server');
 let http_proxy = require('http-proxy');
 let proxy = http_proxy.createProxyServer({});
+proxy.on('proxyReq', (proxyReq, req, res, options) => {
+    console.debug(`proxying ${req.headers.host}${req.url} to ${proxyReq.host}${proxyReq.path}`)
+});
+proxy.on('proxyRes', (proxyRes, req, res) => {
+    console.debug(`proxy response code: ${proxyRes.statusCode} ${proxyRes.statusMessage}`)
+});
+proxy.on('error', (err, req, res, target) => {
+    console.error(err);
+    res.status(500).send({status: 'error', message: JSON.stringify(err)});
+});
 let sites = require('./server/sites');
 
 let proxy_middleware = async (req, res, next) => {
     //set the proxy object on the request so that it's available to all the site proxies
     req.proxy = proxy;
+    let handled = false;
     try {
         for(let site of sites) {
             if(site.test(req)) {
+                handled = true;
                 await site.handle(req, res);
-                next();
+                break;
             }
         }
+        if(!handled)
+            next();
     }
     catch(err) {
         return next(err);

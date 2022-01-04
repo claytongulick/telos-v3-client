@@ -16,15 +16,13 @@ module.exports = {
         if (!req?.session?.user)
             return res.redirect(`/auth?redirect_url=${encodeURI(req.url)}`);
         let user = req.session.user;
-        let organization = req.session.CLIENT_ID;
-        let role = user.role;
+        let organization = req.session.client_id;
         if (
             (organization == process.env.CLIENT_ID) &&
-            (role == 'admin')
+            (user.roles.includes('admin'))
         ) {
-            logger.debug(`Proxying request for ${req.path} to ${process.env.ADMIN_HOST}:${process.env.ADMIN_HTTP_PORT}`);
             req.proxy.web(req, res, {
-                target: `${process.env.ADMIN_HOST}:${process.env.ADMIN_HTTP_PORT}`,
+                target: `http://${process.env.ADMIN_HOST}:${process.env.ADMIN_HTTP_PORT}`,
                 headers: {
                     'REMOTE_USER': user.username
                 }

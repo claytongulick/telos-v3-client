@@ -18,7 +18,7 @@
 import '@ionic/core/dist/esm';
 import {defineCustomElements} from '@ionic/core/dist/esm/loader';
 import '@ionic/core/css/ionic.bundle.css';
-import './css/theme.css';
+import 'common/ui/css/theme.css';
 
 //configure the databroker to prefix with /admin
 import {Broker} from "databroker";

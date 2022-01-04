@@ -25,14 +25,6 @@ let schema = {
     },
 
     /**
-     * The organization the user belongs to. This is useful for shared-auth sessions that cross subdomains.
-     */
-    organization: {
-        type: DataTypes.STRING,
-        defaultValue: process.env.CLIENT_ID
-    },
-
-    /**
      * In most cases, this will be the same as the username. In the cases where we have a system that requires an alternate username, 
      * we have the separate email address for redundancy
      */

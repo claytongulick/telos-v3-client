@@ -60,7 +60,10 @@ class RedirectController {
         }
         //this is a relative redirect, just check that the path is valid
         else {
-            let parts = sanitized.split('/');
+            let normalized;
+            if(sanitized.startsWith('/'))
+                normalized = sanitized.substring(1);
+            let parts = normalized.split('/');
             let base_path = parts[0];
             if(!(validateBasePath(base_path)))
                 return res.status(403).json({status: 'error', message: 'Invalid redirect url'});

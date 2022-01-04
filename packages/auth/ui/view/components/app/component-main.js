@@ -107,7 +107,7 @@ class ComponentMain extends HTMLElement {
         if(redirect_url)
             ApplicationState.set('app.redirect_url', redirect_url, {persist: false});
         else
-            ApplicationState.rm('app.redirect_url');
+            ApplicationState.set('app.redirect_url','');
 
     }
 
