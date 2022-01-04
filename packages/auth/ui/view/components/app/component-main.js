@@ -10,6 +10,7 @@ import {Broker} from 'databroker';
 
 import SceneHome from '../scene/scene-home';
 import ScenePassword from '../scene/flows/password/scene-password';
+import SceneLoginOTP from '../scene/flows/otp/scene-login-otp';
 import ApplicationState from 'applicationstate';
 
 import sign_in_image from '../../../image/sign_in.svg';
@@ -73,6 +74,7 @@ class ComponentMain extends HTMLElement {
             <ion-router @ionRouteDidChange=${(e) => this.handleRouteChange(e)}>
                 <ion-route url='/' component='scene-home'></ion-route>
                 <ion-route url='/password' component='scene-password'></ion-route>
+                <ion-route url='/otp' component='scene-login-otp'></ion-route>
             </ion-router>
             <div >
                 <div style="height: 50px; width: 100%; background-color: var(--ion-color-primary); display: flex; flex-direction: row; align-items: center; justify-content: flex-start;">

@@ -4,10 +4,8 @@
  *   @author Clayton Gulick <clay@ratiosoftware.com>
  */
 import {html, render} from 'lit-html';
-import {classMap} from 'lit-html/directives/class-map';
 import ApplicationState from 'applicationstate';
-import Messaging from '../../../../shared/view/binding/binding-messaging';
-import broker from '../../../../shared/isolate/isolate-data_broker';
+import {Broker} from 'databroker';
 import otp_image from '../../../../../image/otp-code.svg';
 
 class SceneLoginOTP extends HTMLElement {
@@ -22,6 +20,7 @@ class SceneLoginOTP extends HTMLElement {
 
     constructor() {
         super();
+        this.broker = new Broker();
         this.send_sms = true;
     }
 
@@ -53,8 +52,10 @@ class SceneLoginOTP extends HTMLElement {
                     line-height: 36px;
                     letter-spacing: 0.02em;
                     margin-top: 32px;
+                    display: flex;
+                    justify-content: center;
                 ">
-                    Enter the code we sent to log in.
+                    Enter the code we sent to log in:
                 </div>
                 <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
                     <input type="text" 
@@ -91,10 +92,15 @@ class SceneLoginOTP extends HTMLElement {
                         >
                 </div>
                 <div id="login_error_message" style="
+                    margin-top: 10px;
                     font-size: 10px;
                     font-weight: bold;
                     color: red;
                 "></div>
+                <div @click=${e => this.handleDifferentLogin()}
+                    style="display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ion-color-secondary); font-size: 12px; margin-top: 10px; font-style: underline;">
+                    I'd like to log in a different way
+                </div>
                 <div style="
                     margin-top: 30%;
                     font-style: normal;
@@ -141,6 +147,13 @@ class SceneLoginOTP extends HTMLElement {
 
     }
 
+    async handleDifferentLogin() {
+        ApplicationState.set('app.preferred_login_method','');
+        ApplicationState.set('app.side_image','');
+        let router = document.querySelector('ion-router');
+        await router.push('/','back');
+    }
+
     async initOTP() {
         let input_element = document.querySelector('input[autocomplete="one-time-code"]');
         input_element.focus();
@@ -148,31 +161,36 @@ class SceneLoginOTP extends HTMLElement {
             if (!input_element) return;
             this._abort_controller = new AbortController();
             console.info("Requesting SMS OTP access...");
-            let otp = await navigator.credentials.get({
-                otp: { transport: ['sms'] },
-                signal: this._abort_controller.signal
-            });
-            console.info("Received otp: " + JSON.stringify(otp));
-            input_element.value = otp.code;
-            await this.loginWithCode();
+            try {
+                let otp = await navigator.credentials.get({
+                    otp: { transport: ['sms'] },
+                    signal: this._abort_controller.signal
+                });
+                console.info("Received otp: " + JSON.stringify(otp));
+                input_element.value = otp.code;
+                await this.loginWithCode();
+            }
+            catch(err) {console.error(err);}
         }
     }
 
     async loginWithCode() {
-        if(this._abort_controller)
-            this._abort_controller.abort();
+        try {
+            if(this._abort_controller)
+                this._abort_controller.abort();
+        }
+        catch(err) {console.error(err)}
 
         let error_message_element = this.querySelector('#login_error_message');
         let code_element = this.querySelector('#otp_code');
-        let login_user = ApplicationState.get('app.login_user');
-        let email_address = login_user.email_address;
+        let email_address = ApplicationState.get('app.login_email_address');
 
         try {
-            let response = await broker.post('/api/otp', {
+            let response = await this.broker.post('/api/otp/login', {
                 email_address: email_address,
                 code: code_element.value
             });
-            let user = await broker.get('/api/whoami');
+            let user = await this.broker.get('/api/whoami');
             await ApplicationState.set('app.user', user);
             let url = new URL(window.location.toString());
             let redirect = url.searchParams.get('redirect_url');

@@ -2,8 +2,15 @@ const { DataTypes, Model } = require('sequelize');
 const SMS = require('common/server/sms'),
     Email = require('common/server/email');
 /**
- * @typedef {Object} Communication
+ * @typedef {Object} CommunicationSchema
  * @property {number} id The unique id for the activity
+ * @property {string} to The UUID of the user
+ * @property {string} type 'sms' or 'email'
+ * @property {string} communication_template the template to use, if any
+ * @property {string} content the rendered content
+ * @property {object} data data to pass to the template
+ * @property {string} status the current status
+ * @property {Date} status_date the date of the current status
  */
 let schema = {
     /**
@@ -26,7 +33,10 @@ let schema = {
     /**
      * The type of communication, 'sms','email'...
      */
-    type: DataTypes.STRING,
+    type: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
 
     /**
      * The communication template to use for sending the communication
@@ -74,6 +84,7 @@ let schema = {
 
 class CommunicationError extends Error {
     constructor(communication_id, message, err) {
+        super();
         this.stack = err?.stack;
         this.name = "CommunicationError";
         this.message = `${message} ${err ? JSON.stringify(err) : ''}`;
@@ -116,7 +127,7 @@ class Communication extends Model {
                     await this.save();
                     throw new CommunicationError(this.id, "Invalid communication template");
                 }
-                this.content = template.render(this.data);
+                this.content = await template.render(this.data);
             }
 
             this.status = 'pending';
@@ -124,25 +135,31 @@ class Communication extends Model {
             await this.save();
 
             if (this.type == 'sms') {
-                if (!user.phone) {
+                if (!to_user.phone) {
                     this.status = 'error';
                     this.status_date = new Date();
                     await this.save();
                     throw new CommunicationError(this.id, "User missing phone number");
                 }
 
-                await SMS.sendMessage(user.phone, this.content);
+                await SMS.sendMessage(to_user.phone, this.content);
+                this.status = 'complete';
+                this.status_date = new Date();
+                await this.save();
                 return;
             }
 
             if(this.type == 'email') {
                 await Email.sendEmail(
-                    user.email_address, 
+                    to_user.email_address, 
                     this.data.subject, 
                     this.content,
                     process.env.FROM_EMAIL_ADDRESS,
                     this.data.attachments
                 );
+                this.status = 'complete';
+                this.status_date = new Date();
+                await this.save();
                 return;
             }
         }

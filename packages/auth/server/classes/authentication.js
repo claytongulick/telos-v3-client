@@ -62,11 +62,13 @@ class Authentication {
         /** @type AuthSession */
         let session = req.session;
 
+        /** 
         if(flow !== session.flow)
             throw new Error("Invalid flow");
 
         if(user.id !== session.user.id)
             throw new Error("Invalid user");
+        */
 
         let destroySession = util.promisify(session.destroy).bind(session);
         await destroySession();
@@ -97,6 +99,11 @@ class Authentication {
 
         session.status = step;
         session.trusted = false;
+        session.user = {};
+        session.user.id = user?.id;
+        session.user.resource = user?.resource;
+        session.user.roles = user?.roles;
+        session.user.username = user?.username;
 
         await Activity.create({
             type: 'auth',
@@ -124,6 +131,11 @@ class Authentication {
         session.status = "complete";
         session.trusted = true;
         session.session_trusted_date = new Date();
+        session.user = {};
+        session.user.id = user?.id;
+        session.user.resource = user?.resource;
+        session.user.roles = user?.roles;
+        session.user.username = user?.username;
 
         await Activity.create({
             type: 'auth',

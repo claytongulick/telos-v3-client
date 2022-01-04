@@ -87,7 +87,7 @@ class DatabaseCommands {
 
         if(options.name) {
             if(!valid_fixtures.includes(options.name))
-                throw new Error("Invalid fuxture name: " + options.name)
+                throw new Error("Invalid fixture name: " + options.name)
 
             if(options.destroy) {
                 await destroy_functions[options.name]();

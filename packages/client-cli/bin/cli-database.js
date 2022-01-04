@@ -32,7 +32,7 @@ async function main() {
         .command('init')
         .description('Initialize the database with fixture data')
         .option("-a, --all", "Initialize database with all fixtures. This will delete existing data in the tables and replace it with the fixture data.")
-        .option("-n, --name", "Initialize database with specified fixture name. This will replace existing data in the table.")
+        .option("-n, --name <name>", "Initialize database with specified fixture name. This will replace existing data in the table.")
         .option("-d, --destroy", "Delete all existing data from the table prior to importing fixtures")
         .action(async (options) => {
             await DatabaseCommands.init(options);

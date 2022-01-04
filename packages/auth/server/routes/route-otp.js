@@ -15,7 +15,7 @@ module.exports = (router) => {
         .post(
             //rate limit to three times per minute
             //RateLimiter.limit(60 * 60 * 1000, 3), 
-            OTPController.login
+            Util.wrap(OTPController.login)
         );
     /**
      * Send the OTP to the specified communication type

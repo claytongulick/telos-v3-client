@@ -16,6 +16,7 @@
     "databroker": "^0.2.3",
     "express": "^4.17.1",
     "fido2-lib": "^2.6.8",
+    "handlebars-helpers": "^0.10.0",
     "twilio": "^3.72.0",
     "uuid": "^8.3.2"
   }

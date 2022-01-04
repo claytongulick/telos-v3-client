@@ -1,6 +1,8 @@
 const { DataTypes, Model } = require('sequelize');
 const {PatchableModel} = require('common/server/json-patch-sequelize');
 const handlebars = require('handlebars');
+const handlebars_helpers = require('handlebars-helpers');
+handlebars_helpers.string();
 
 /**
  * @typedef {Object} CommunicationTemplate
@@ -44,12 +46,13 @@ let schema = {
 class CommunicationTemplate extends PatchableModel {
     async render(data) {
         let template;
-        if(this.compiled)
+        template = handlebars.compile(this.content);
+        /*if(this.compiled)
             template = handlebars.template(this.compiled);
         else {
             this.compiled = template = handlebars.precompile(this.content);
             await this.save();
-        }
+        }*/
         return template(data);
     }
 

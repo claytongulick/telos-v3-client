@@ -184,7 +184,7 @@ class SceneHome extends HTMLElement {
         let email_address = this.email_address;
 
         try {
-            let result = await broker.post('/api/otp/send', {type, email_address});
+            let result = await this.broker.post('/api/otp/send', {type, email_address});
             let router = document.querySelector('ion-router');
             await router.push('/otp');
         }

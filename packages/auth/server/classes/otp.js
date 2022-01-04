@@ -1,8 +1,9 @@
+const Encryption = require('common/server/encryption');
+const User = require('common/db/models/user');
 class OTP {
-    static async setOTP(user_id) {
-        let user = await User.findOne({where: {id: user_id}, attributes:['id', 'otp']});
+    static async setOTP(user) {
         if(!user)
-            throw new Error("Invalid user_id");
+            throw new Error("Invalid user");
 
         let code_length = 6;
         //use a cryptographically strong generation algorithm for code creation. Math.random() won't cut it
@@ -17,18 +18,20 @@ class OTP {
         await user.save();
     }
 
-    static async authenticateOTP(user_id, code, info) {
-        let user = await User.findOne({where: {id: user_id}, attributes:['id', 'otp']});
+    static async authenticateOTP(user_id, code) {
+        let user = await User.findOne({where: {id: user_id}, attributes:['id', 'otp_code', 'otp_consumed', 'otp_attempts','otp_created_date']});
         if(!user)
             throw new Error("Invalid user_id");
 
-        let valid = await Authentication.validateOTP(user.otp, code);
+        let valid = await OTP.validateOTP(user, code);
 
         if(!valid) {
             user.otp_attempts += 1;
             await user.save();
             return false;
         }
+
+        return true;
 
     }
 
@@ -47,12 +50,14 @@ class OTP {
         if(ticks > expiration)
             return false;
 
-        if(user.otp_code !== code)
-            return false;
-
         //passed all checks
-        return true;
+        if(user.otp_code === code)
+            return true;
+
+        return false;
 
     }
 
 }
+
+module.exports = OTP;
