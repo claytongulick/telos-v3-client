@@ -43,18 +43,22 @@ function startApp(name, options) {
             admin_process = shell.exec(`node ${inspect} ./admin/server.js ${auth}`,{async: true});
             break;
         case 'patient':
+            return;
             patient_process = shell.exec(`node ${inspect} ./patient/server.js ${auth}`,{async: true});
             break;
         case 'provider':
+            return;
             provider_process = shell.exec(`node ${inspect} ./provider/server.js ${auth}`,{async: true});
             break;
         case 'proxy':
             proxy_process = shell.exec(`node ${inspect} ./proxy/server.js ${auth}`,{async: true});
             break;
         case 'fhir':
+            return;
             fhir_process = shell.exec(`java ${java_debug} -jar ../fhir-server/target/fhir-server.war`,{async: true});
             break;
         case 'superset':
+            return;
             superset_process = shell.exec(`gunicorn -k gevent --timeout 120 -b 127.0.0.1:5000 --limit-request-line 0 --limit-request-field_size 0 "superset.app:create_app()"`, {async: true});
             break;
         default:
@@ -89,6 +93,8 @@ class AppCommands {
             }
             return;
         }
+        if(options.proxy)
+            startApp('proxy');
         startApp(name, options);
     }
 }

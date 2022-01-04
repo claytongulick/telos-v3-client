@@ -1,6 +1,7 @@
 const glob = require('glob');
 const path = require('path');
 const routes = [];
+const express = require('express');
 
 // Globbing routing files - auto-include all of our defined routes
 glob.sync(`${__dirname}/**/*.js`).forEach(
