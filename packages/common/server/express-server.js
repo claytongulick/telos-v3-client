@@ -86,6 +86,20 @@ module.exports = function (logger, routers, config, middleware) {
     app.use(helmet.referrerPolicy());
     app.use(helmet.xssFilter());
 
+    // Should be placed before express.static
+    app.use(compression());
+
+    //configure statics
+    if (typeof config.statics_dir == 'string')
+        //e-tags are calculated at request time, the whole file is read. We'll use last-modified for caching
+        app.use(config.mount_path, express.static(config.statics_dir, { etag: false }));
+    else if (Array.isArray(config.statics_dir) && config.statics_dir.length > 1)
+        config.statics_dir.forEach(
+            function (dir) {
+                app.use(config.mount_path, express.static(path.resolve(dir), { etag: false }));
+            }
+        );
+
     //set up dynamic session based on the hostname that came into this IP. 
     //this is to support *.teloshs.com as well as whitelabeled domains
     app.use((req, res, next) => {
@@ -196,19 +210,6 @@ module.exports = function (logger, routers, config, middleware) {
         limit: '10mb'
     }));
 
-    // Should be placed before express.static
-    app.use(compression());
-
-    //configure statics
-    if (typeof config.statics_dir == 'string')
-        //e-tags are calculated at request time, the whole file is read. We'll use last-modified for caching
-        app.use(config.mount_path, express.static(config.statics_dir, { etag: false }));
-    else if (Array.isArray(config.statics_dir) && config.statics_dir.length > 1)
-        config.statics_dir.forEach(
-            function (dir) {
-                app.use(config.mount_path, express.static(path.resolve(dir), { etag: false }));
-            }
-        );
 
     //set up http request logging
     if (['development', 'qa', 'production'].includes(process.env.NODE_ENV)) {
