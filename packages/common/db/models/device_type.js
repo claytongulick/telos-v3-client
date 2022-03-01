@@ -23,13 +23,6 @@ let schema = {
     },
 
     /**
-     * The device id that the vendor assigned to the hardware device
-     */
-    vendor_device_id: {
-        type: DataTypes.STRING
-    },
-
-    /**
      * The manufacturer name of the device
      */
     manufacturer: {

@@ -1,0 +1,2 @@
+PYTHONPATH=/home/superset/
+PATH=/bin:/usr/bin:/home/superset/.local/bin
