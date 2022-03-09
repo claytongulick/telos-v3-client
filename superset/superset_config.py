@@ -38,7 +38,7 @@ ENABLE_PROXY_FIX = True
 
 AUTH_TYPE = AUTH_OAUTH
 OAUTH_PROVIDERS = [
-    {   'name':'mattermost',
+    {   'name':'telos',
         'token_key':'access_token', # Name of the token in the response of access_token_url
         'icon':'fa-address-card',   # Icon for the provider
         'remote_app': {

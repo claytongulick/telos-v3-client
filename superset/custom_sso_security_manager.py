@@ -5,7 +5,7 @@ class CustomSsoSecurityManager(SupersetSecurityManager):
 
     def oauth_user_info(self, provider, response=None):
         logging.debug("Oauth2 provider: {0}.".format(provider))
-        if provider == 'mattermost':
+        if provider == 'telos':
             result = self.appbuilder.sm.oauth_remotes[provider].get('api/v4/users/me')
             user = result.json()
             logging.debug("user_data: {0}".format(user))
