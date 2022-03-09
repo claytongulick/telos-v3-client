@@ -16,6 +16,7 @@ class CustomSsoSecurityManager(SupersetSecurityManager):
                     'last_name': user.get('last_name','')
                    }
 
+    #the below is just for debugging oauth
     #def set_oauth_session(self, provider, oauth_response):
     #    """
     #        Set the current session with OAuth user secrets

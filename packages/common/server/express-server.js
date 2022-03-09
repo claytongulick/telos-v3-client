@@ -213,7 +213,7 @@ module.exports = function (logger, routers, config, middleware) {
 
     //set up http request logging
     if (['development', 'qa', 'production'].includes(process.env.NODE_ENV)) {
-        var accessLogStream = rfs(config.web_logs.file_name, {
+        const accessLogStream = rfs.createStream(config.web_logs.file_name, {
             interval: config.web_logs.rotation_interval,
             path: config.web_logs.path
         });

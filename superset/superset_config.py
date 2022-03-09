@@ -55,7 +55,7 @@ OAUTH_PROVIDERS = [
             'access_token_headers':{    # Additional headers for calls to access_token_url
                 'Authorization': 'Basic Base64EncodedClientIdAndSecret'
             },
-            'api_base_url':'https://telos.teloshs.com/collab/oauth/',
+            'api_base_url':'https://telos.teloshs.com/collab/',
             'access_token_url':'https://telos.teloshs.com/collab/oauth/access_token',
             'authorize_url':'https://telos.teloshs.com/collab/oauth/authorize'
         }
