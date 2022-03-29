@@ -72,3 +72,4 @@ protected_media
 .DS_Store
 *.DS_Store
 target/
+mattermost/data

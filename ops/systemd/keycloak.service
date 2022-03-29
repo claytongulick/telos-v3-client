@@ -1,0 +1,12 @@
+[Unit]
+Description=Keycloak Service
+After=network.target
+
+[Service]
+User=keycloak
+Group=keycloak
+ExecStart=/home/keycloak/deploy/bin/kc.sh
+WorkingDirectory=/home/Keycloak/deploy
+
+[Install]
+WantedBy=multi-user.target

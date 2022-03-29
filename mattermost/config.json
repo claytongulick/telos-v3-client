@@ -550,6 +550,12 @@
             "com.mattermost.plugin-channel-export": {
                 "Enable": true
             },
+            "com.telos.reporting": {
+                "Enable": true
+            },
+            "com.teloshs.mattermost": {
+                "Enable": true
+            },
             "focalboard": {
                 "Enable": true
             },
